@@ -5,7 +5,7 @@ export default function Gallery() {
       alt: "Comunidad La Cantera Experience",
     },
     {
-      src: "/images/galeria-comunidad1.jpg",
+      src: "/images/galeria-comunidad1.JPG",
       alt: "Comunidad La Cantera Experience",
     },
     {
@@ -13,39 +13,39 @@ export default function Gallery() {
       alt: "Experiencias deportivas La Cantera",
     },
     {
-      src: "/images/galeria-comunidad3.jpg",
+      src: "/images/galeria-comunidad3.JPG",
       alt: "Comunidad deportiva La Cantera",
     },
     {
-      src: "/images/galeria-comunidad4.jpg",
+      src: "/images/galeria-comunidad4.JPG",
       alt: "Momentos de la comunidad La Cantera",
     },
     {
-      src: "/images/galeria-comunidad5.jpg",
+      src: "/images/galeria-comunidad5.JPG",
       alt: "Experiencias deportivas La Cantera",
     },
     {
-      src: "/images/galeria-comunidad6.jpg",
+      src: "/images/galeria-comunidad6.JPG",
       alt: "Actividades de La Cantera Experience",
     },
     {
-      src: "/images/galeria-comunidad7.jpg",
+      src: "/images/galeria-comunidad7.JPG",
       alt: "Comunidad deportiva La Cantera",
     },
     {
-      src: "/images/galeria-comunidad8.jpg",
+      src: "/images/galeria-comunidad8.JPG",
       alt: "Experiencias de fútbol La Cantera",
     },
     {
-      src: "/images/galeria-comunidad9.jpg",
+      src: "/images/galeria-comunidad9.JPG",
       alt: "Momentos de La Cantera Experience",
     },
     {
-      src: "/images/galeria-comunidad10.jpg",
+      src: "/images/galeria-comunidad10.JPG",
       alt: "Comunidad La Cantera Experience",
     },
     {
-      src: "/images/galeria-comunidad11.jpg",
+      src: "/images/galeria-comunidad11.JPG",
       alt: "Actividades deportivas La Cantera",
     },
     {
@@ -61,23 +61,23 @@ export default function Gallery() {
       alt: "Momentos deportivos La Cantera",
     },
     {
-      src: "/images/galeria-comunidad15.jpg",
+      src: "/images/galeria-comunidad15.JPG",
       alt: "Experiencias de la comunidad La Cantera",
     },
     {
-      src: "/images/galeria-comunidad16.jpg",
+      src: "/images/galeria-comunidad16.JPG",
       alt: "Actividades La Cantera Experience",
     },
     {
-      src: "/images/galeria-comunidad17.jpg",
+      src: "/images/galeria-comunidad17.JPG",
       alt: "Comunidad La Cantera Experience",
     },
     {
-      src: "/images/galeria-comunidad18.jpg",
+      src: "/images/galeria-comunidad18.png",
       alt: "Comunidad La Cantera Experience",
     },
     {
-      src: "/images/galeria-comunidad19.jpg",
+      src: "/images/galeria-comunidad19.png",
       alt: "Comunidad La Cantera Experience",
     },
   ];
