@@ -15,6 +15,14 @@ const links = [
   { href: "/#contacto", label: "Contacto" },
 ];
 
+const sessionLinks = [
+  { href: "/jugar", label: "Partidos" },
+  { href: "/jugar?seccion=mis-partidos", label: "Mis partidos" },
+  { href: "/jugar?seccion=notificaciones", label: "Notificaciones" },
+  { href: "/jugar?seccion=pack", label: "Compra pack" },
+  { href: "/jugar?vista=sesion", label: "Mi perfil" },
+];
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -128,7 +136,7 @@ export default function Navbar() {
 
       <div
         className={`overflow-hidden transition-all duration-500 lg:hidden ${
-          menuOpen ? "max-h-[600px]" : "max-h-0"
+          menuOpen ? "max-h-[900px]" : "max-h-0"
         } ${
           scrolled
             ? "bg-white/95 backdrop-blur-md"
@@ -151,6 +159,26 @@ export default function Navbar() {
               {link.label}
             </a>
           ))}
+
+          <div className={`my-3 border-t pt-4 ${scrolled ? "border-zinc-200" : "border-white/20"}`}>
+            <p className={`mb-2 px-4 text-xs font-bold tracking-[0.16em] ${scrolled ? "text-zinc-500" : "text-lime-300"}`}>
+              SESIÓN DE PRUEBA
+            </p>
+            {sessionLinks.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                className={`block rounded-xl px-4 py-3 text-center font-semibold transition-all duration-300 ${
+                  scrolled
+                    ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700"
+                    : "text-white hover:bg-white/10"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
 
           <a
             href="/#contacto"
