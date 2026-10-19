@@ -41,14 +41,14 @@ export default function Navbar() {
           : "bg-transparent"
       }`}
     >
-      <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-6 lg:px-8">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-6 lg:h-24 lg:px-8">
 
         {/* =========================
             LOGO
         ========================= */}
 
         <Link
-          href="#inicio"
+          href="/#inicio"
           className="relative z-20 flex items-center transition-transform duration-300 hover:scale-105"
         >
           <Image
@@ -57,7 +57,7 @@ export default function Navbar() {
             width={160}
             height={160}
             priority
-            className="relative top-8 h-[160px] w-[160px] object-contain"
+            className="h-[82px] w-[82px] object-contain sm:h-[92px] sm:w-[92px] lg:relative lg:top-8 lg:h-[160px] lg:w-[160px]"
           />
         </Link>
 

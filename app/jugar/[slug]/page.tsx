@@ -74,16 +74,16 @@ export default async function PartidoPage({ params, searchParams }: PartidoPageP
                 {partido.direccion} · Ver en Maps
               </a>
 
-              <div className="mt-7 grid gap-7 border-t border-zinc-100 pt-6 sm:grid-cols-2 sm:gap-10">
+              <div className="mt-7 grid gap-8 border-t border-zinc-100 pt-6 sm:grid-cols-2 sm:gap-10">
                 <div>
                   <h3 className="font-black">Reglas</h3>
-                  <ul className="mt-3 space-y-2 text-sm leading-relaxed text-zinc-600">
+                  <ul className="mt-3 space-y-3 text-sm leading-relaxed text-zinc-600">
                     {partido.reglas.map((regla) => <li key={regla}>{regla}</li>)}
                   </ul>
                 </div>
                 <div>
                   <h3 className="font-black">Jugadoras inscriptas</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-zinc-700">
+                  <p className="mt-3 text-sm leading-7 text-zinc-700">
                     {partido.jugadoras.join(" · ")}
                   </p>
                 </div>
