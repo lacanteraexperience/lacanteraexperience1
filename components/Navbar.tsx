@@ -135,15 +135,18 @@ export default function Navbar() {
       ========================= */}
 
       <div
-        className={`overflow-hidden transition-all duration-500 lg:hidden ${
-          menuOpen ? "max-h-[900px]" : "max-h-0"
+        className={`fixed bottom-0 right-0 top-20 z-40 w-[min(22rem,88vw)] overflow-y-auto border-l shadow-2xl transition-transform duration-300 lg:hidden ${
+          menuOpen ? "translate-x-0" : "translate-x-full"
         } ${
           scrolled
-            ? "bg-white/95 backdrop-blur-md"
-            : "bg-black/90 backdrop-blur-md"
+            ? "border-zinc-200 bg-white/95 backdrop-blur-md"
+            : "border-white/10 bg-zinc-950/95 backdrop-blur-md"
         }`}
       >
-        <nav className="flex flex-col gap-2 px-6 py-6">
+        <nav aria-label="Menú móvil" className="flex min-h-full flex-col gap-2 px-5 py-6">
+          <p className={`mb-2 text-xs font-bold tracking-[0.16em] ${scrolled ? "text-zinc-500" : "text-lime-300"}`}>
+            NAVEGACIÓN
+          </p>
 
           {links.map((link) => (
             <a
