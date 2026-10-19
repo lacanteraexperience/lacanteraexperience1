@@ -145,7 +145,16 @@ export default function Navbar() {
             BOTÓN MÓVIL
         ========================= */}
 
-        {(!isJugarRoute || sessionActive) && (
+        {isJugarRoute && !sessionActive ? (
+          <a
+            href="/jugar?vista=sesion"
+            className={`rounded-full border px-4 py-2 text-xs font-bold lg:hidden ${
+              scrolled ? "border-zinc-900 text-zinc-900" : "border-white text-white"
+            }`}
+          >
+            Iniciar sesión
+          </a>
+        ) : (
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
