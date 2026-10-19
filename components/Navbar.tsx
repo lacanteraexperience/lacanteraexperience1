@@ -20,12 +20,14 @@ const sessionLinks = [
   { href: "/jugar?seccion=mis-partidos", label: "Mis partidos" },
   { href: "/jugar?seccion=notificaciones", label: "Notificaciones" },
   { href: "/jugar?seccion=pack", label: "Compra pack" },
-  { href: "/jugar?vista=sesion", label: "Mi perfil" },
+  { href: "/jugar?seccion=perfil", label: "Mi perfil" },
 ];
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [sessionActive, setSessionActive] = useState(false);
+  const [isJugarRoute, setIsJugarRoute] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,6 +41,11 @@ export default function Navbar() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
+  }, []);
+
+  useEffect(() => {
+    setSessionActive(new URLSearchParams(window.location.search).get("vista") === "sesion");
+    setIsJugarRoute(window.location.pathname.startsWith("/jugar"));
   }, []);
 
   return (
@@ -75,21 +82,45 @@ export default function Navbar() {
 
         <nav className="hidden items-center gap-10 lg:flex">
 
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className={`group relative text-[15px] font-semibold transition-colors duration-300 ${
-                scrolled
-                  ? "text-gray-800 hover:text-lime-600"
-                  : "text-white hover:text-lime-300"
-              }`}
-            >
-              {link.label}
-
-              <span className="absolute -bottom-2 left-0 h-[2px] w-0 rounded-full bg-lime-500 transition-all duration-300 group-hover:w-full" />
-            </a>
-          ))}
+          {isJugarRoute ? (
+            sessionActive ? (
+              sessionLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href.replace("/jugar?", "/jugar?vista=sesion&")}
+                  className={`group relative text-[15px] font-semibold transition-colors duration-300 ${
+                    scrolled ? "text-gray-800 hover:text-lime-600" : "text-white hover:text-lime-300"
+                  }`}
+                >
+                  {link.label}
+                  <span className="absolute -bottom-2 left-0 h-[2px] w-0 rounded-full bg-lime-500 transition-all duration-300 group-hover:w-full" />
+                </a>
+              ))
+            ) : (
+              <a
+                href="/jugar#partidos"
+                className={`group relative text-[15px] font-semibold transition-colors duration-300 ${
+                  scrolled ? "text-gray-800 hover:text-lime-600" : "text-white hover:text-lime-300"
+                }`}
+              >
+                Próximos partidos
+                <span className="absolute -bottom-2 left-0 h-[2px] w-0 rounded-full bg-lime-500 transition-all duration-300 group-hover:w-full" />
+              </a>
+            )
+          ) : (
+            links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className={`group relative text-[15px] font-semibold transition-colors duration-300 ${
+                  scrolled ? "text-gray-800 hover:text-lime-600" : "text-white hover:text-lime-300"
+                }`}
+              >
+                {link.label}
+                <span className="absolute -bottom-2 left-0 h-[2px] w-0 rounded-full bg-lime-500 transition-all duration-300 group-hover:w-full" />
+              </a>
+            ))
+          )}
 
           <div className="flex items-center gap-4">
             <a
@@ -100,12 +131,12 @@ export default function Navbar() {
             >
               Solicitá tu experiencia
             </a>
-            <Link
-              href="/jugar?vista=sesion"
+            <a
+              href={sessionActive ? "/jugar?vista=sesion&seccion=perfil" : "/jugar?vista=sesion"}
               className="rounded-full bg-lime-500 px-5 py-2.5 text-sm font-semibold text-black shadow-lg transition-all duration-300 hover:scale-105 hover:bg-lime-400"
             >
-              Sesión de prueba
-            </Link>
+              {sessionActive ? "Mi perfil" : "Iniciar sesión"}
+            </a>
           </div>
 
         </nav>
@@ -114,19 +145,17 @@ export default function Navbar() {
             BOTÓN MÓVIL
         ========================= */}
 
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
-          className={`transition-colors duration-300 lg:hidden ${
-            scrolled ? "text-gray-900" : "text-white"
-          }`}
-        >
-          {menuOpen ? (
-            <HiXMark size={36} />
-          ) : (
-            <HiBars3 size={36} />
-          )}
-        </button>
+        {(!isJugarRoute || sessionActive) && (
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+            className={`transition-colors duration-300 lg:hidden ${
+              scrolled ? "text-gray-900" : "text-white"
+            }`}
+          >
+            {menuOpen ? <HiXMark size={36} /> : <HiBars3 size={36} />}
+          </button>
+        )}
 
       </div>
 
@@ -137,18 +166,15 @@ export default function Navbar() {
       <div
         className={`fixed bottom-0 right-0 top-20 z-40 w-[min(22rem,88vw)] overflow-y-auto border-l shadow-2xl transition-transform duration-300 lg:hidden ${
           menuOpen ? "translate-x-0" : "translate-x-full"
-        } ${
-          scrolled
+        } ${scrolled
             ? "border-zinc-200 bg-white/95 backdrop-blur-md"
             : "border-white/10 bg-zinc-950/95 backdrop-blur-md"
         }`}
       >
         <nav aria-label="Menú móvil" className="flex min-h-full flex-col gap-2 px-5 py-6">
-          <p className={`mb-2 text-xs font-bold tracking-[0.16em] ${scrolled ? "text-zinc-500" : "text-lime-300"}`}>
-            NAVEGACIÓN
-          </p>
+          {!isJugarRoute && <p className={`mb-2 text-xs font-bold tracking-[0.16em] ${scrolled ? "text-zinc-500" : "text-lime-300"}`}>NAVEGACIÓN</p>}
 
-          {links.map((link) => (
+          {!isJugarRoute && links.map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -163,25 +189,34 @@ export default function Navbar() {
             </a>
           ))}
 
-          <div className={`my-3 border-t pt-4 ${scrolled ? "border-zinc-200" : "border-white/20"}`}>
-            <p className={`mb-2 px-4 text-xs font-bold tracking-[0.16em] ${scrolled ? "text-zinc-500" : "text-lime-300"}`}>
-              SESIÓN DE PRUEBA
-            </p>
-            {sessionLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
+          {sessionActive && (
+            <div className={`my-3 border-t pt-4 ${scrolled ? "border-zinc-200" : "border-white/20"}`}>
+              <p className={`mb-2 px-4 text-xs font-bold tracking-[0.16em] ${scrolled ? "text-zinc-500" : "text-lime-300"}`}>
+                SESIÓN DE PRUEBA
+              </p>
+              {sessionLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href.replace("/jugar?", "/jugar?vista=sesion&")}
+                  onClick={() => setMenuOpen(false)}
+                  className={`block rounded-xl px-4 py-3 text-center font-semibold transition-all duration-300 ${
+                    scrolled
+                      ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700"
+                      : "text-white hover:bg-white/10"
+                  }`}
+                >
+                  {link.label}
+                </a>
+              ))}
+              <a
+                href="/jugar"
                 onClick={() => setMenuOpen(false)}
-                className={`block rounded-xl px-4 py-3 text-center font-semibold transition-all duration-300 ${
-                  scrolled
-                    ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700"
-                    : "text-white hover:bg-white/10"
-                }`}
+                className={`mt-2 block rounded-xl px-4 py-3 text-center text-sm font-semibold ${scrolled ? "text-zinc-500" : "text-zinc-300"}`}
               >
-                {link.label}
-              </Link>
-            ))}
-          </div>
+                Cerrar sesión de prueba
+              </a>
+            </div>
+          )}
 
           <a
             href="/#contacto"
@@ -190,13 +225,13 @@ export default function Navbar() {
           >
             Solicitá tu experiencia
           </a>
-          <Link
-            href="/jugar?vista=sesion"
+          <a
+            href={sessionActive ? "/jugar?vista=sesion&seccion=perfil" : "/jugar?vista=sesion"}
             onClick={() => setMenuOpen(false)}
             className="rounded-full border border-lime-400 px-6 py-4 text-center font-semibold text-lime-300"
           >
-            Sesión de prueba
-          </Link>
+            {sessionActive ? "Mi perfil" : "Iniciar sesión"}
+          </a>
 
         </nav>
       </div>
