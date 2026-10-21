@@ -17,7 +17,7 @@ export async function currentProfile(): Promise<CurrentProfile | null> {
   const lastName = user?.lastName?.trim() || "";
   const role = email === initialAdminEmail ? "admin" : "player";
   const sql = neon(databaseUrl);
-  const rows = await sql<{ id: string; auth_user_id: string; email: string | null; role: CurrentProfile["role"] }[]>`
+  const rows = await sql`
     INSERT INTO profiles (auth_user_id, first_name, last_name, email, role)
     VALUES (${userId}, ${firstName}, ${lastName}, ${email}, ${role})
     ON CONFLICT (auth_user_id) DO UPDATE
@@ -28,7 +28,12 @@ export async function currentProfile(): Promise<CurrentProfile | null> {
     RETURNING id::text, auth_user_id, email, role
   `;
   const profile = rows[0];
-  return profile ? { id: profile.id, authUserId: profile.auth_user_id, email: profile.email, role: profile.role } : null;
+  return profile ? {
+    id: String(profile.id),
+    authUserId: String(profile.auth_user_id),
+    email: typeof profile.email === "string" ? profile.email : null,
+    role: profile.role === "admin" || profile.role === "organizer" ? profile.role : "player",
+  } : null;
 }
 
 export async function requireAdministrator() {

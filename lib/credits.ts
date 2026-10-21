@@ -37,16 +37,16 @@ export async function ensureCreditSchema() {
 
 export async function creditBalance(playerId: string): Promise<PlayerCredit> {
   const sql = database();
-  const rows = await sql<{ balance: number }[]>`
+  const rows = await sql`
     SELECT COALESCE(balance, 0)::int AS balance FROM player_credits WHERE player_id = ${playerId}
   `;
-  return { playerId, balance: rows[0]?.balance ?? 0 };
+  return { playerId, balance: Number(rows[0]?.balance ?? 0) };
 }
 
 export async function assignCredits({ playerId, amount, note, administratorId }: { playerId: string; amount: number; note?: string; administratorId: string }) {
   if (!Number.isInteger(amount) || amount < 1) throw new Error("La cantidad de partidos debe ser un número entero positivo.");
   const sql = database();
-  const rows = await sql<{ balance: number }[]>`
+  const rows = await sql`
     WITH updated_credit AS (
       INSERT INTO player_credits (player_id, balance)
       VALUES (${playerId}::uuid, ${amount})
@@ -59,5 +59,5 @@ export async function assignCredits({ playerId, amount, note, administratorId }:
     )
     SELECT balance::int AS balance FROM updated_credit
   `;
-  return rows[0]?.balance ?? 0;
+  return Number(rows[0]?.balance ?? 0);
 }
