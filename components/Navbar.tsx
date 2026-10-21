@@ -27,7 +27,6 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [sessionActive, setSessionActive] = useState(false);
-  const [isJugarRoute, setIsJugarRoute] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,7 +44,6 @@ export default function Navbar() {
 
   useEffect(() => {
     setSessionActive(new URLSearchParams(window.location.search).get("vista") === "sesion");
-    setIsJugarRoute(window.location.pathname.startsWith("/jugar"));
   }, []);
 
   return (
@@ -82,45 +80,18 @@ export default function Navbar() {
 
         <nav className="hidden items-center gap-10 lg:flex">
 
-          {isJugarRoute ? (
-            sessionActive ? (
-              sessionLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href.replace("/jugar?", "/jugar?vista=sesion&")}
-                  className={`group relative text-[15px] font-semibold transition-colors duration-300 ${
-                    scrolled ? "text-gray-800 hover:text-lime-600" : "text-white hover:text-lime-300"
-                  }`}
-                >
-                  {link.label}
-                  <span className="absolute -bottom-2 left-0 h-[2px] w-0 rounded-full bg-lime-500 transition-all duration-300 group-hover:w-full" />
-                </a>
-              ))
-            ) : (
-              <a
-                href="/jugar#partidos"
-                className={`group relative text-[15px] font-semibold transition-colors duration-300 ${
-                  scrolled ? "text-gray-800 hover:text-lime-600" : "text-white hover:text-lime-300"
-                }`}
-              >
-                Próximos partidos
-                <span className="absolute -bottom-2 left-0 h-[2px] w-0 rounded-full bg-lime-500 transition-all duration-300 group-hover:w-full" />
-              </a>
-            )
-          ) : (
-            links.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className={`group relative text-[15px] font-semibold transition-colors duration-300 ${
-                  scrolled ? "text-gray-800 hover:text-lime-600" : "text-white hover:text-lime-300"
-                }`}
-              >
-                {link.label}
-                <span className="absolute -bottom-2 left-0 h-[2px] w-0 rounded-full bg-lime-500 transition-all duration-300 group-hover:w-full" />
-              </a>
-            ))
-          )}
+          {links.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className={`group relative text-[15px] font-semibold transition-colors duration-300 ${
+                scrolled ? "text-gray-800 hover:text-lime-600" : "text-white hover:text-lime-300"
+              }`}
+            >
+              {link.label}
+              <span className="absolute -bottom-2 left-0 h-[2px] w-0 rounded-full bg-lime-500 transition-all duration-300 group-hover:w-full" />
+            </a>
+          ))}
 
           <div className="flex items-center gap-4">
             <a
@@ -145,26 +116,15 @@ export default function Navbar() {
             BOTÓN MÓVIL
         ========================= */}
 
-        {isJugarRoute && !sessionActive ? (
-          <a
-            href="/jugar?vista=sesion"
-            className={`rounded-full border px-4 py-2 text-xs font-bold lg:hidden ${
-              scrolled ? "border-zinc-900 text-zinc-900" : "border-white text-white"
-            }`}
-          >
-            Iniciar sesión
-          </a>
-        ) : (
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
-            className={`transition-colors duration-300 lg:hidden ${
-              scrolled ? "text-gray-900" : "text-white"
-            }`}
-          >
-            {menuOpen ? <HiXMark size={36} /> : <HiBars3 size={36} />}
-          </button>
-        )}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+          className={`transition-colors duration-300 lg:hidden ${
+            scrolled ? "text-gray-900" : "text-white"
+          }`}
+        >
+          {menuOpen ? <HiXMark size={36} /> : <HiBars3 size={36} />}
+        </button>
 
       </div>
 
@@ -181,9 +141,9 @@ export default function Navbar() {
         }`}
       >
         <nav aria-label="Menú móvil" className="flex min-h-full flex-col gap-2 px-5 py-6">
-          {!isJugarRoute && <p className={`mb-2 text-xs font-bold tracking-[0.16em] ${scrolled ? "text-zinc-500" : "text-lime-300"}`}>NAVEGACIÓN</p>}
+          <p className={`mb-2 text-xs font-bold tracking-[0.16em] ${scrolled ? "text-zinc-500" : "text-lime-300"}`}>NAVEGACIÓN</p>
 
-          {!isJugarRoute && links.map((link) => (
+          {links.map((link) => (
             <a
               key={link.href}
               href={link.href}
