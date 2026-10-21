@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { HiBars3, HiXMark } from "react-icons/hi2";
+import { useUser } from "@clerk/nextjs";
 import { useDemoSession } from "@/components/DemoSessionProvider";
 
 const links = [
@@ -20,6 +21,8 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { hasDemoSession } = useDemoSession();
+  const { isSignedIn, user } = useUser();
+  const isAdministrator = user?.primaryEmailAddress?.emailAddress?.toLowerCase() === "lacanterafutfem@gmail.com";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -98,7 +101,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
             >
               Solicita tu experiencia
             </Link>
-            {hasDemoSession ? <span aria-label="Gabriela Marty" className="flex h-9 w-9 items-center justify-center rounded-full bg-lime-500 text-xs font-black text-black">GM</span> : <a href="/iniciar-sesion" className="text-sm font-semibold text-white transition hover:text-lime-300">Inicia sesión / Regístrate</a>}
+            {hasDemoSession ? <span aria-label="Gabriela Marty" className="flex h-9 w-9 items-center justify-center rounded-full bg-lime-500 text-xs font-black text-black">GM</span> : isSignedIn ? <><Link href="/mi-saldo" className="text-sm font-semibold text-white transition hover:text-lime-300">Mi saldo</Link>{isAdministrator && <Link href="/administracion/creditos" className="rounded-full bg-lime-500 px-4 py-2 text-sm font-bold text-black">Administración</Link>}</> : <a href="/iniciar-sesion" className="text-sm font-semibold text-white transition hover:text-lime-300">Inicia sesión / Regístrate</a>}
           </div>
 
         </nav>
@@ -164,7 +167,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
           >
             Solicita tu experiencia
           </Link>
-          {!hasDemoSession && <a href="/iniciar-sesion" onClick={() => setMenuOpen(false)} className={`rounded-xl px-4 py-3 text-center font-medium transition-all duration-300 ${dark ? "text-white hover:bg-white/10" : scrolled ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700" : "text-white hover:bg-white/10"}`}>Inicia sesión / Regístrate</a>}
+          {!hasDemoSession && (isSignedIn ? <><Link href="/mi-saldo" onClick={() => setMenuOpen(false)} className={`rounded-xl px-4 py-3 text-center font-medium transition-all duration-300 ${dark ? "text-white hover:bg-white/10" : scrolled ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700" : "text-white hover:bg-white/10"}`}>Mi saldo</Link>{isAdministrator && <Link href="/administracion/creditos" onClick={() => setMenuOpen(false)} className="rounded-xl bg-lime-500 px-4 py-3 text-center font-bold text-black">Administración</Link>}</> : <a href="/iniciar-sesion" onClick={() => setMenuOpen(false)} className={`rounded-xl px-4 py-3 text-center font-medium transition-all duration-300 ${dark ? "text-white hover:bg-white/10" : scrolled ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700" : "text-white hover:bg-white/10"}`}>Inicia sesión / Regístrate</a>)}
 
 
         </nav>
