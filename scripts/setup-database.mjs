@@ -83,6 +83,21 @@ const schema = String.raw`
     policy_version TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   );
+  CREATE TABLE IF NOT EXISTS player_credits (
+    player_id UUID PRIMARY KEY REFERENCES profiles(id) ON DELETE CASCADE,
+    balance INTEGER NOT NULL DEFAULT 0 CHECK (balance >= 0),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE TABLE IF NOT EXISTS credit_movements (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    player_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    amount INTEGER NOT NULL CHECK (amount <> 0),
+    kind TEXT NOT NULL CHECK (kind IN ('admin_assignment', 'registration', 'refund', 'adjustment')),
+    note TEXT,
+    activity_id UUID REFERENCES activities(id) ON DELETE SET NULL,
+    created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
 `;
 
 for (const statement of schema.split(";").map((value) => value.trim()).filter(Boolean)) {
