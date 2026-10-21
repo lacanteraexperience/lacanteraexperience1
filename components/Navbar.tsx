@@ -94,6 +94,27 @@ export default function Navbar() {
           ))}
 
           <div className="flex items-center gap-4">
+            {sessionActive && (
+              <details className="group relative">
+                <summary className="cursor-pointer list-none rounded-full border border-lime-400 px-4 py-2 text-sm font-semibold text-lime-400 transition hover:bg-lime-400 hover:text-zinc-950">
+                  Mi sesión
+                </summary>
+                <div className="absolute right-0 top-11 z-50 w-52 rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl">
+                  {sessionLinks.map((link) => (
+                    <a
+                      key={link.label}
+                      href={link.href.replace("/jugar?", "/jugar?vista=sesion&")}
+                      className="block rounded-xl px-3 py-2 text-sm font-semibold text-zinc-800 hover:bg-lime-100 hover:text-lime-800"
+                    >
+                      {link.label}
+                    </a>
+                  ))}
+                  <a href="/jugar" className="mt-1 block rounded-xl px-3 py-2 text-sm font-semibold text-zinc-500 hover:bg-zinc-100">
+                    Cerrar sesión de prueba
+                  </a>
+                </div>
+              </details>
+            )}
             <a
               href="/#contacto"
               className={`text-xs font-semibold transition-colors ${
@@ -106,7 +127,7 @@ export default function Navbar() {
               href={sessionActive ? "/jugar?vista=sesion&seccion=perfil" : "/jugar?vista=sesion"}
               className="rounded-full bg-lime-500 px-5 py-2.5 text-sm font-semibold text-black shadow-lg transition-all duration-300 hover:scale-105 hover:bg-lime-400"
             >
-              {sessionActive ? "Mi perfil" : "Iniciar sesión"}
+              {sessionActive ? "Perfil" : "Iniciar sesión"}
             </a>
           </div>
 
