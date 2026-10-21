@@ -15,7 +15,7 @@ function readActivities() {
     return saved.filter((item) => !item.cancelled && !item.completed).map((item) => ({
       id: item.id, field: item.field, dateTime: item.date, format: item.format, occupied: item.confirmedPaid, capacity: item.capacity,
       address: defaultMatches.find((match) => match.field === item.field)?.address ?? "Barcelona", mapsUrl: "https://maps.google.com", start: item.dateISO,
-      durationMinutes: Math.max(30, (new Date(item.endISO).getTime() - new Date(item.dateISO).getTime()) / 60_000), level: item.level, tags: item.tags, rules: rulesForFormat(item.format),
+      durationMinutes: Math.max(30, (new Date(item.endISO).getTime() - new Date(item.dateISO).getTime()) / 60_000), level: item.level, tags: item.tags, rules: rulesForFormat(item.format), players: [],
     } satisfies Match));
   } catch { return defaultMatches; }
 }
