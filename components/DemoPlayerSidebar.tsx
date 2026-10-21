@@ -25,7 +25,7 @@ export default function DemoPlayerSidebar() {
       </nav>
       <button type="button" onClick={endDemo} className="mt-auto w-full rounded-full border border-red-200 px-4 py-3 text-sm font-bold text-red-700 transition hover:bg-red-50">Cerrar sesión de prueba</button>
     </aside>
-    <button type="button" onClick={() => setMobileOpen(true)} className="fixed bottom-5 left-5 z-40 rounded-full bg-zinc-950 px-5 py-3 text-sm font-bold text-white shadow-xl lg:hidden">Menú de jugadora</button>
+    <button type="button" onClick={() => setMobileOpen(true)} className="fixed right-4 top-[calc(6.5rem+env(safe-area-inset-top))] z-50 rounded-full bg-zinc-950 px-5 py-3 text-sm font-bold text-white shadow-xl ring-2 ring-lime-300 lg:hidden">Abrir menú de jugadora</button>
     {mobileOpen && <DemoPlayerDrawer onClose={() => setMobileOpen(false)} />}
   </>;
 }
