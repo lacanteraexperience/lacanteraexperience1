@@ -76,6 +76,33 @@ export default function Footer() {
                 </a>
               </li>
 
+              <li>
+                <a
+                  href="/politica-privacidad"
+                  className="transition-colors hover:text-lime-500"
+                >
+                  Política de privacidad
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="/terminos-de-uso"
+                  className="transition-colors hover:text-lime-500"
+                >
+                  Términos de uso
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="/codigo-de-conducta"
+                  className="transition-colors hover:text-lime-500"
+                >
+                  Código de conducta
+                </a>
+              </li>
+
             </ul>
           </div>
 

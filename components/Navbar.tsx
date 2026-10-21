@@ -4,19 +4,22 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { HiBars3, HiXMark } from "react-icons/hi2";
+import { useDemoSession } from "@/components/DemoSessionProvider";
 
 const links = [
-  { href: "#inicio", label: "Inicio" },
-  { href: "#nosotros", label: "Historia" },
-  { href: "#comunidad", label: "Comunidad" },
-  { href: "#experiencias", label: "Experiencias" },
-  { href: "#galeria", label: "Galería" },
-  { href: "#contacto", label: "Contacto" },
+  { href: "/#inicio", label: "Inicio" },
+  { href: "/#nosotros", label: "Historia" },
+  { href: "/#comunidad", label: "Comunidad" },
+  { href: "/#experiencias", label: "Experiencias" },
+  { href: "/jugar", label: "Jugar" },
+  { href: "/#galeria", label: "Galería" },
+  { href: "/#contacto", label: "Contacto" },
 ];
 
-export default function Navbar() {
+export default function Navbar({ dark = false }: { dark?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { hasDemoSession } = useDemoSession();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,7 +38,9 @@ export default function Navbar() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled
+        dark
+          ? "bg-zinc-950 shadow-xl"
+          : scrolled
           ? "bg-white/95 shadow-xl backdrop-blur-md"
           : "bg-transparent"
       }`}
@@ -47,7 +52,7 @@ export default function Navbar() {
         ========================= */}
 
         <Link
-          href="#inicio"
+          href="/#inicio"
           className="relative z-20 flex items-center transition-transform duration-300 hover:scale-105"
         >
           <Image
@@ -56,7 +61,7 @@ export default function Navbar() {
             width={160}
             height={160}
             priority
-            className="relative top-8 h-[160px] w-[160px] object-contain"
+            className={dark ? "h-20 w-20 object-contain" : "relative top-8 h-[160px] w-[160px] object-contain"}
           />
         </Link>
 
@@ -64,14 +69,16 @@ export default function Navbar() {
             MENÚ ESCRITORIO
         ========================= */}
 
-        <nav className="hidden items-center gap-10 lg:flex">
+        <nav className="hidden items-center gap-8 lg:flex">
 
           {links.map((link) => (
             <a
               key={link.href}
               href={link.href}
               className={`group relative text-[15px] font-semibold transition-colors duration-300 ${
-                scrolled
+                dark
+                  ? "text-white hover:text-lime-300"
+                  : scrolled
                   ? "text-gray-800 hover:text-lime-600"
                   : "text-white hover:text-lime-300"
               }`}
@@ -82,12 +89,17 @@ export default function Navbar() {
             </a>
           ))}
 
-          <a
-            href="#contacto"
-            className="rounded-full bg-lime-500 px-7 py-3 font-semibold text-black shadow-lg transition-all duration-300 hover:scale-105 hover:bg-lime-400"
-          >
-            Solicita tu experiencia
-          </a>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/#contacto"
+              className={`text-xs font-semibold transition-colors duration-300 ${
+                dark ? "text-white/85 hover:text-lime-300" : scrolled ? "text-gray-600 hover:text-lime-600" : "text-white/85 hover:text-lime-300"
+              }`}
+            >
+              Solicita tu experiencia
+            </Link>
+            {hasDemoSession ? <span aria-label="Gabriela Marty" className="flex h-9 w-9 items-center justify-center rounded-full bg-lime-500 text-xs font-black text-black">GM</span> : <a href="/iniciar-sesion" className="text-sm font-semibold text-white transition hover:text-lime-300">Inicia sesión / Regístrate</a>}
+          </div>
 
         </nav>
 
@@ -99,7 +111,7 @@ export default function Navbar() {
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
           className={`transition-colors duration-300 lg:hidden ${
-            scrolled ? "text-gray-900" : "text-white"
+            dark || !scrolled ? "text-white" : "text-gray-900"
           }`}
         >
           {menuOpen ? (
@@ -119,7 +131,9 @@ export default function Navbar() {
         className={`overflow-hidden transition-all duration-500 lg:hidden ${
           menuOpen ? "max-h-[600px]" : "max-h-0"
         } ${
-          scrolled
+          dark
+            ? "bg-zinc-950"
+            : scrolled
             ? "bg-white/95 backdrop-blur-md"
             : "bg-black/90 backdrop-blur-md"
         }`}
@@ -132,7 +146,9 @@ export default function Navbar() {
               href={link.href}
               onClick={() => setMenuOpen(false)}
               className={`rounded-xl px-4 py-4 text-center font-medium transition-all duration-300 ${
-                scrolled
+                dark
+                  ? "text-white hover:bg-white/10"
+                  : scrolled
                   ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700"
                   : "text-white hover:bg-white/10"
               }`}
@@ -141,13 +157,15 @@ export default function Navbar() {
             </a>
           ))}
 
-          <a
-            href="#contacto"
+          <Link
+            href="/#contacto"
             onClick={() => setMenuOpen(false)}
             className="mt-4 rounded-full bg-lime-500 px-6 py-4 text-center font-semibold text-black transition-all duration-300 hover:bg-lime-400"
           >
             Solicita tu experiencia
-          </a>
+          </Link>
+          {!hasDemoSession && <a href="/iniciar-sesion" onClick={() => setMenuOpen(false)} className={`rounded-xl px-4 py-3 text-center font-medium transition-all duration-300 ${dark ? "text-white hover:bg-white/10" : scrolled ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700" : "text-white hover:bg-white/10"}`}>Inicia sesión / Regístrate</a>}
+
 
         </nav>
       </div>
