@@ -10,7 +10,7 @@ export default function SignInPage() {
       <Navbar dark />
       <section className="mx-auto flex min-h-[55vh] max-w-5xl items-center justify-center px-6 py-12 lg:px-8">
         <div className="flex w-full justify-center">
-          <SignIn signUpUrl="/registrate" fallbackRedirectUrl="/jugar" />
+          <SignIn path="/iniciar-sesion" routing="path" signUpUrl="/registrate" fallbackRedirectUrl="/jugar" />
         </div>
       </section>
       <Footer />
