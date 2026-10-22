@@ -1,6 +1,5 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import DemoJugarDashboard from "@/components/DemoJugarDashboard";
 import SharedMatchExplorer from "@/components/SharedMatchExplorer";
 
 export const metadata = { title: "Jugar | La Cantera Experience" };
@@ -15,7 +14,6 @@ export default function JugarPage() {
         <p className="mt-4 max-w-xl text-lg text-gray-600">Únete a los partidos de La Cantera. Elige pista, horario y formato.</p>
         <SharedMatchExplorer />
       </section>
-      <DemoJugarDashboard />
       <Footer />
     </main>
   );

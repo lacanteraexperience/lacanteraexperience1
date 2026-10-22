@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import MatchSessionDetails from "@/components/MatchSessionDetails";
 import ShareMatchButton from "@/components/ShareMatchButton";
 import { matches } from "@/lib/matches";
 
@@ -25,14 +24,8 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
           <p className={`mt-3 font-bold ${isFull ? "text-red-600" : "text-gray-900"}`}>
             {isFull ? "Partido lleno" : `${match.occupied} de ${match.capacity} plazas ocupadas`}
           </p>
-          <p className="mt-6 rounded-2xl bg-lime-50 px-4 py-3 text-sm font-medium text-gray-700">
-            <Link href="/iniciar-sesion" className="font-bold text-lime-800 underline underline-offset-4">
-              Activa la sesión de prueba
-            </Link>{" "}
-            para ver la información completa e inscribirte
-          </p>
+          <p className="mt-6 rounded-2xl bg-lime-50 px-4 py-3 text-sm font-medium text-gray-700">Inicia sesión para ver la información completa e inscribirte cuando estén habilitadas las inscripciones.</p>
           <div className="mt-7"><ShareMatchButton matchId={match.id} /></div>
-          <MatchSessionDetails match={match} />
         </article>
       </section>
       <Footer />

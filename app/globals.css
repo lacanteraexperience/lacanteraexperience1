@@ -30,23 +30,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-@media (min-width: 1024px) {
-  .demo-session-in-jugar .jugar-page-content {
-    width: calc(100% - 20rem);
-    max-width: none;
-    margin-left: 20rem;
-    margin-right: 0;
-  }
-
-  .demo-session-in-jugar .public-jugar-content {
-    display: none;
-  }
-}
-
-.demo-session-in-jugar .public-jugar-content {
-  display: none;
-}
-
 /* Separador corto y centrado junto a la hora en las tarjetas compactas. */
 .border-r.border-stone-200 {
   border-right-color: transparent;
@@ -60,37 +43,4 @@ body {
   background-position: right center;
   background-repeat: no-repeat;
   background-size: 1px 100%;
-}
-
-/* Administración: el panel conserva todas las herramientas en móvil. */
-@media (max-width: 639px) {
-  .admin-demo h1 {
-    font-size: 2rem;
-    line-height: 1.1;
-  }
-
-  .admin-demo-tabs {
-    margin-right: -1rem;
-    padding-right: 1rem;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    scrollbar-width: thin;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .admin-demo .overflow-x-auto {
-    position: relative;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-  }
-
-  .admin-demo input,
-  .admin-demo select,
-  .admin-demo textarea {
-    max-width: 100%;
-  }
-
-  .admin-demo input.min-w-64 {
-    min-width: 0;
-  }
 }
