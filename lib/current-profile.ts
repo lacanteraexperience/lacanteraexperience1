@@ -12,10 +12,11 @@ export async function currentProfile(): Promise<CurrentProfile | null> {
   if (!databaseUrl) throw new Error("La base de datos no está configurada.");
 
   const user = await currentUser();
-  const email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() ?? null;
+  const emails = user?.emailAddresses.map(({ emailAddress }) => emailAddress.toLowerCase()) ?? [];
+  const email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() ?? emails[0] ?? null;
   const firstName = user?.firstName?.trim() || "Jugadora";
   const lastName = user?.lastName?.trim() || "";
-  const role = email === initialAdminEmail ? "admin" : "player";
+  const role = emails.includes(initialAdminEmail) ? "admin" : "player";
   const sql = neon(databaseUrl);
   const rows = await sql`
     INSERT INTO profiles (auth_user_id, first_name, last_name, email, role)

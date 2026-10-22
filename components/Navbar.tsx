@@ -20,7 +20,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { isSignedIn, user } = useUser();
-  const isAdministrator = user?.primaryEmailAddress?.emailAddress?.toLowerCase() === "lacanterafutfem@gmail.com";
+  const isAdministrator = user?.emailAddresses.some(({ emailAddress }) => emailAddress.toLowerCase() === "lacanterafutfem@gmail.com") ?? false;
 
   useEffect(() => {
     const handleScroll = () => {
