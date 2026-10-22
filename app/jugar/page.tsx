@@ -1,10 +1,13 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SharedMatchExplorer from "@/components/SharedMatchExplorer";
+import { currentProfile } from "@/lib/current-profile";
 
 export const metadata = { title: "Jugar | La Cantera Experience" };
 
-export default function JugarPage() {
+export default async function JugarPage() {
+  await currentProfile();
+
   return (
     <main className="min-h-screen bg-stone-50 pt-28 text-gray-950">
       <Navbar dark />
