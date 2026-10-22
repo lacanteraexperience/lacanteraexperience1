@@ -3,6 +3,13 @@ import { neon } from "@neondatabase/serverless";
 
 const initialAdminEmail = "lacanterafutfem@gmail.com";
 
+function normalizeEmail(value: string) {
+  const [localPart, domain] = value.trim().toLowerCase().split("@");
+  if (!localPart || !domain) return value.trim().toLowerCase();
+  if (domain === "gmail.com" || domain === "googlemail.com") return `${localPart.split("+")[0].replaceAll(".", "")}@gmail.com`;
+  return `${localPart}@${domain}`;
+}
+
 export type CurrentProfile = { id: string; authUserId: string; email: string | null; role: "player" | "organizer" | "admin" };
 
 export async function currentProfile(): Promise<CurrentProfile | null> {
@@ -16,8 +23,8 @@ export async function currentProfile(): Promise<CurrentProfile | null> {
   const email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() ?? emails[0] ?? null;
   const firstName = user?.firstName?.trim() || "Jugadora";
   const lastName = user?.lastName?.trim() || "";
-  const role = emails.includes(initialAdminEmail) ? "admin" : "player";
   const sql = neon(databaseUrl);
+  const role = emails.map(normalizeEmail).includes(normalizeEmail(initialAdminEmail)) ? "admin" : "player";
   const rows = await sql`
     INSERT INTO profiles (auth_user_id, first_name, last_name, email, role)
     VALUES (${userId}, ${firstName}, ${lastName}, ${email}, ${role})

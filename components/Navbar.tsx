@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { HiBars3, HiXMark } from "react-icons/hi2";
-import { useUser } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 
 const links = [
   { href: "/#inicio", label: "Inicio" },
@@ -21,7 +21,11 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [profileRole, setProfileRole] = useState<"player" | "organizer" | "admin" | null>(null);
   const { isSignedIn, user } = useUser();
-  const isAdministrator = profileRole === "admin" || (user?.emailAddresses.some(({ emailAddress }) => emailAddress.toLowerCase() === "lacanterafutfem@gmail.com") ?? false);
+  const isAdministrator = profileRole === "admin" || (user?.emailAddresses.some(({ emailAddress }) => {
+    const [localPart, domain] = emailAddress.trim().toLowerCase().split("@");
+    const normalized = (domain === "gmail.com" || domain === "googlemail.com") ? `${localPart?.split("+")[0].replaceAll(".", "")}@gmail.com` : emailAddress.trim().toLowerCase();
+    return normalized === "lacanterafutfem@gmail.com";
+  }) ?? false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -111,7 +115,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
             >
               Solicita tu experiencia
             </Link>
-            {isSignedIn ? <><Link href="/mi-perfil" className="text-sm font-semibold text-white transition hover:text-lime-300">Mi perfil</Link><Link href="/mi-saldo" className="text-sm font-semibold text-white transition hover:text-lime-300">Mi saldo</Link>{isAdministrator && <Link href="/administracion" className="rounded-full bg-lime-500 px-4 py-2 text-sm font-bold text-black">Administración</Link>}</> : <a href="/iniciar-sesion" className="text-sm font-semibold text-white transition hover:text-lime-300">Inicia sesión / Regístrate</a>}
+            {isSignedIn ? <><Link href="/mi-perfil" className="text-sm font-semibold text-white transition hover:text-lime-300">Mi perfil</Link><Link href="/mi-saldo" className="text-sm font-semibold text-white transition hover:text-lime-300">Mi saldo</Link>{isAdministrator && <Link href="/administracion" className="rounded-full bg-lime-500 px-4 py-2 text-sm font-bold text-black">Administración</Link>}<UserButton /></> : <a href="/iniciar-sesion" className="text-sm font-semibold text-white transition hover:text-lime-300">Inicia sesión / Regístrate</a>}
           </div>
 
         </nav>
@@ -177,7 +181,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
           >
             Solicita tu experiencia
           </Link>
-          {isSignedIn ? <><Link href="/mi-perfil" onClick={() => setMenuOpen(false)} className={`rounded-xl px-4 py-3 text-center font-medium transition-all duration-300 ${dark ? "text-white hover:bg-white/10" : scrolled ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700" : "text-white hover:bg-white/10"}`}>Mi perfil</Link><Link href="/mi-saldo" onClick={() => setMenuOpen(false)} className={`rounded-xl px-4 py-3 text-center font-medium transition-all duration-300 ${dark ? "text-white hover:bg-white/10" : scrolled ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700" : "text-white hover:bg-white/10"}`}>Mi saldo</Link>{isAdministrator && <Link href="/administracion" onClick={() => setMenuOpen(false)} className="rounded-xl bg-lime-500 px-4 py-3 text-center font-bold text-black">Administración</Link>}</> : <a href="/iniciar-sesion" onClick={() => setMenuOpen(false)} className={`rounded-xl px-4 py-3 text-center font-medium transition-all duration-300 ${dark ? "text-white hover:bg-white/10" : scrolled ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700" : "text-white hover:bg-white/10"}`}>Inicia sesión / Regístrate</a>}
+          {isSignedIn ? <><Link href="/mi-perfil" onClick={() => setMenuOpen(false)} className={`rounded-xl px-4 py-3 text-center font-medium transition-all duration-300 ${dark ? "text-white hover:bg-white/10" : scrolled ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700" : "text-white hover:bg-white/10"}`}>Mi perfil</Link><Link href="/mi-saldo" onClick={() => setMenuOpen(false)} className={`rounded-xl px-4 py-3 text-center font-medium transition-all duration-300 ${dark ? "text-white hover:bg-white/10" : scrolled ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700" : "text-white hover:bg-white/10"}`}>Mi saldo</Link>{isAdministrator && <Link href="/administracion" onClick={() => setMenuOpen(false)} className="rounded-xl bg-lime-500 px-4 py-3 text-center font-bold text-black">Administración</Link>}<div className="mx-auto mt-3"><UserButton /></div></> : <a href="/iniciar-sesion" onClick={() => setMenuOpen(false)} className={`rounded-xl px-4 py-3 text-center font-medium transition-all duration-300 ${dark ? "text-white hover:bg-white/10" : scrolled ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700" : "text-white hover:bg-white/10"}`}>Inicia sesión / Regístrate</a>}
 
 
         </nav>
