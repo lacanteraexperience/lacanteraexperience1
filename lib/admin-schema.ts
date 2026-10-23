@@ -13,17 +13,21 @@ export async function ensureFormatSchema() {
     capacity INTEGER NOT NULL CHECK (capacity > 0), minimum INTEGER NOT NULL CHECK (minimum > 0 AND minimum <= capacity),
     rules_group TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`);
+  await sql.query("CREATE TABLE IF NOT EXISTS system_setup (setup_key TEXT PRIMARY KEY)");
+  await sql.query("INSERT INTO system_setup (setup_key) SELECT 'format_defaults_v1' WHERE EXISTS (SELECT 1 FROM activity_formats) ON CONFLICT DO NOTHING");
   await sql.query(`
-    INSERT INTO activity_formats (name, capacity, minimum, rules_group) VALUES
-      ('5vs5+suplentes', 12, 10, 'Pista pequeña'),
-      ('5vs5', 10, 10, 'Pista pequeña'),
-      ('6vs6', 12, 10, 'Pista pequeña'),
-      ('7vs7', 14, 14, 'Pista grande'),
-      ('8vs8', 16, 14, 'Pista grande'),
-      ('7vs7+suplentes', 16, 14, 'Pista grande'),
-      ('11vs11', 22, 22, 'Pista grande'),
-      ('11vs11+suplentes', 24, 22, 'Pista grande')
-    ON CONFLICT (name) DO NOTHING
+    WITH first_setup AS (
+      INSERT INTO system_setup (setup_key) VALUES ('format_defaults_v1')
+      ON CONFLICT DO NOTHING RETURNING setup_key
+    )
+    INSERT INTO activity_formats (name, capacity, minimum, rules_group)
+    SELECT name, capacity, minimum, rules_group FROM (VALUES
+      ('5vs5+suplentes', 12, 10, 'Pista pequeña'), ('5vs5', 10, 10, 'Pista pequeña'),
+      ('6vs6', 12, 10, 'Pista pequeña'), ('7vs7', 14, 14, 'Pista grande'),
+      ('8vs8', 16, 14, 'Pista grande'), ('7vs7+suplentes', 16, 14, 'Pista grande'),
+      ('11vs11', 22, 22, 'Pista grande'), ('11vs11+suplentes', 24, 22, 'Pista grande')
+    ) AS defaults(name, capacity, minimum, rules_group)
+    WHERE EXISTS (SELECT 1 FROM first_setup)
   `);
 }
 
