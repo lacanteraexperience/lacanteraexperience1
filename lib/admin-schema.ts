@@ -19,3 +19,13 @@ export async function ensurePlayerFields() {
   const sql = adminDatabase();
   await sql.query("ALTER TABLE profiles ADD COLUMN IF NOT EXISTS club TEXT");
 }
+
+export async function ensureFinanceSchema() {
+  const sql = adminDatabase();
+  await sql.query(`CREATE TABLE IF NOT EXISTS financial_entries (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(), entry_date DATE NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('income', 'expense')), concept TEXT NOT NULL,
+    category TEXT NOT NULL, amount_cents INTEGER NOT NULL CHECK (amount_cents > 0), note TEXT,
+    created_by UUID REFERENCES profiles(id) ON DELETE SET NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`);
+}

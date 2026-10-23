@@ -57,6 +57,17 @@ const schema = String.raw`
     remaining_credits INTEGER NOT NULL CHECK (remaining_credits >= 0),
     purchased_at TIMESTAMPTZ NOT NULL DEFAULT now()
   );
+  CREATE TABLE IF NOT EXISTS financial_entries (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    entry_date DATE NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('income', 'expense')),
+    concept TEXT NOT NULL,
+    category TEXT NOT NULL,
+    amount_cents INTEGER NOT NULL CHECK (amount_cents > 0),
+    note TEXT,
+    created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
   CREATE TABLE IF NOT EXISTS registrations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     activity_id UUID NOT NULL REFERENCES activities(id),
