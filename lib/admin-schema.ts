@@ -13,6 +13,18 @@ export async function ensureFormatSchema() {
     capacity INTEGER NOT NULL CHECK (capacity > 0), minimum INTEGER NOT NULL CHECK (minimum > 0 AND minimum <= capacity),
     rules_group TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`);
+  await sql.query(`
+    INSERT INTO activity_formats (name, capacity, minimum, rules_group) VALUES
+      ('5vs5+suplentes', 12, 10, 'Pista pequeña'),
+      ('5vs5', 10, 10, 'Pista pequeña'),
+      ('6vs6', 12, 10, 'Pista pequeña'),
+      ('7vs7', 14, 14, 'Pista grande'),
+      ('8vs8', 16, 14, 'Pista grande'),
+      ('7vs7+suplentes', 16, 14, 'Pista grande'),
+      ('11vs11', 22, 22, 'Pista grande'),
+      ('11vs11+suplentes', 24, 22, 'Pista grande')
+    ON CONFLICT (name) DO NOTHING
+  `);
 }
 
 export async function ensurePlayerFields() {
