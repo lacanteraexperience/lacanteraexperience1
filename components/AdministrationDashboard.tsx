@@ -6,6 +6,8 @@ import FormatAdministration from "@/components/FormatAdministration";
 import PlayerAdministration from "@/components/PlayerAdministration";
 import PackAdministration from "@/components/PackAdministration";
 import EconomyAdministration from "@/components/EconomyAdministration";
+import ActivityAdministration from "@/components/ActivityAdministration";
+import RegistrationAdministration from "@/components/RegistrationAdministration";
 
 type SectionId = "partidos" | "pistas" | "formatos" | "jugadoras" | "inscripciones" | "avisos" | "sanciones" | "packs" | "economia";
 
@@ -37,7 +39,7 @@ export default function AdministrationDashboard() {
       <h2 className="mt-2 text-3xl font-black tracking-tight text-gray-950">{active.title}</h2>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-600">{active.description}</p>
 
-      {activeId === "pistas" ? <PitchAdministration /> : activeId === "formatos" ? <FormatAdministration /> : activeId === "jugadoras" ? <PlayerAdministration /> : activeId === "packs" ? <PackAdministration /> : activeId === "economia" ? <EconomyAdministration /> : <EmptySection section={active} />}
+      {activeId === "partidos" ? <ActivityAdministration /> : activeId === "inscripciones" ? <RegistrationAdministration /> : activeId === "pistas" ? <PitchAdministration /> : activeId === "formatos" ? <FormatAdministration /> : activeId === "jugadoras" ? <PlayerAdministration /> : activeId === "packs" ? <PackAdministration /> : activeId === "economia" ? <EconomyAdministration /> : <EmptySection section={active} />}
     </section>
   </>;
 }

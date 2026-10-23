@@ -1,8 +1,5 @@
 "use client";
 
-import MatchExplorer from "@/components/MatchExplorer";
-import { matches } from "@/lib/matches";
+import LiveMatchExplorer from "@/components/LiveMatchExplorer";
 
-export default function SharedMatchExplorer() {
-  return <MatchExplorer matches={matches} />;
-}
+export default function SharedMatchExplorer() { return <LiveMatchExplorer />; }
