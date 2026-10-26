@@ -11,7 +11,6 @@ const links = [
   { href: "/#nosotros", label: "Historia" },
   { href: "/#comunidad", label: "Comunidad" },
   { href: "/#experiencias", label: "Experiencias" },
-  { href: "/jugar", label: "Jugar" },
   { href: "/#galeria", label: "Galería" },
   { href: "/#contacto", label: "Contacto" },
 ];
@@ -115,6 +114,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
             >
               Solicita tu experiencia
             </Link>
+            <Link href="/jugar" className="text-sm font-semibold text-white transition hover:text-lime-300">Jugar</Link>
             {isSignedIn ? <><Link href="/mis-partidos" className="text-sm font-semibold text-white transition hover:text-lime-300">Mis partidos</Link><Link href="/mi-perfil" className="text-sm font-semibold text-white transition hover:text-lime-300">Mi perfil</Link><Link href="/mi-saldo" className="text-sm font-semibold text-white transition hover:text-lime-300">Mi saldo</Link>{isAdministrator && <Link href="/administracion" className="rounded-full bg-lime-500 px-4 py-2 text-sm font-bold text-black">Administración</Link>}<UserButton /></> : <a href="/iniciar-sesion" className="text-sm font-semibold text-white transition hover:text-lime-300">Inicia sesión / Regístrate</a>}
           </div>
 
@@ -184,7 +184,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
           >
             Solicita tu experiencia
           </Link>
-          {isSignedIn ? <><Link href="/mis-partidos" onClick={() => setMenuOpen(false)} className={`rounded-xl px-4 py-3 text-center font-medium transition-all duration-300 ${dark ? "text-white hover:bg-white/10" : scrolled ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700" : "text-white hover:bg-white/10"}`}>Mis partidos</Link><Link href="/mi-perfil" onClick={() => setMenuOpen(false)} className={`rounded-xl px-4 py-3 text-center font-medium transition-all duration-300 ${dark ? "text-white hover:bg-white/10" : scrolled ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700" : "text-white hover:bg-white/10"}`}>Mi perfil</Link><Link href="/mi-saldo" onClick={() => setMenuOpen(false)} className={`rounded-xl px-4 py-3 text-center font-medium transition-all duration-300 ${dark ? "text-white hover:bg-white/10" : scrolled ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700" : "text-white hover:bg-white/10"}`}>Mi saldo</Link>{isAdministrator && <Link href="/administracion" onClick={() => setMenuOpen(false)} className="rounded-xl bg-lime-500 px-4 py-3 text-center font-bold text-black">Administración</Link>}</> : <a href="/iniciar-sesion" onClick={() => setMenuOpen(false)} className={`rounded-xl px-4 py-3 text-center font-medium transition-all duration-300 ${dark ? "text-white hover:bg-white/10" : scrolled ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700" : "text-white hover:bg-white/10"}`}>Inicia sesión / Regístrate</a>}
+          <section className="mt-3 rounded-2xl bg-lime-500/15 p-3 ring-1 ring-lime-500/30"><p className={`px-2 pb-2 text-xs font-black uppercase tracking-[0.16em] ${dark ? "text-lime-300" : "text-lime-800"}`}>La Cantera Play</p><Link href="/jugar" onClick={() => setMenuOpen(false)} className={`block rounded-xl px-4 py-3 text-center font-bold transition ${dark ? "bg-white/10 text-white" : "bg-white text-gray-900"}`}>Jugar</Link>{isSignedIn ? <><Link href="/mis-partidos" onClick={() => setMenuOpen(false)} className={`mt-2 block rounded-xl px-4 py-3 text-center font-medium transition ${dark ? "text-white hover:bg-white/10" : "text-gray-800 hover:bg-white"}`}>Mis partidos</Link><Link href="/mi-perfil" onClick={() => setMenuOpen(false)} className={`block rounded-xl px-4 py-3 text-center font-medium transition ${dark ? "text-white hover:bg-white/10" : "text-gray-800 hover:bg-white"}`}>Mi perfil</Link><Link href="/mi-saldo" onClick={() => setMenuOpen(false)} className={`block rounded-xl px-4 py-3 text-center font-medium transition ${dark ? "text-white hover:bg-white/10" : "text-gray-800 hover:bg-white"}`}>Mi saldo</Link>{isAdministrator && <Link href="/administracion" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-xl bg-lime-500 px-4 py-3 text-center font-bold text-black">Administración</Link>}</> : <Link href="/iniciar-sesion" onClick={() => setMenuOpen(false)} className={`mt-2 block rounded-xl px-4 py-3 text-center font-medium transition ${dark ? "text-white hover:bg-white/10" : "text-gray-800 hover:bg-white"}`}>Inicia sesión / Regístrate</Link>}</section>
 
 
         </nav>
