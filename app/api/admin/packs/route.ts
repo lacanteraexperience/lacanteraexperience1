@@ -9,7 +9,7 @@ export async function GET() {
     const sql = adminDatabase();
     const [packs, players] = await Promise.all([
       sql`SELECT id::text, name, credits, price_cents, starts_at, ends_at, status FROM pack_definitions ORDER BY created_at DESC`,
-      sql`SELECT p.id::text, p.first_name, p.last_name, p.email, COALESCE(SUM(pp.purchased_credits), 0)::int AS purchased, COALESCE(SUM(pp.purchased_credits - pp.remaining_credits), 0)::int AS used, COALESCE(SUM(pp.remaining_credits), 0)::int AS remaining FROM profiles p LEFT JOIN pack_purchases pp ON pp.player_id = p.id WHERE p.role = 'player' GROUP BY p.id ORDER BY p.first_name, p.last_name`,
+      sql`SELECT p.id::text, p.first_name, p.last_name, p.email, p.role, COALESCE(SUM(pp.purchased_credits), 0)::int AS purchased, COALESCE(SUM(pp.purchased_credits - pp.remaining_credits), 0)::int AS used, COALESCE(SUM(pp.remaining_credits), 0)::int AS remaining FROM profiles p LEFT JOIN pack_purchases pp ON pp.player_id = p.id WHERE p.role IN ('player', 'organizer', 'admin') GROUP BY p.id ORDER BY p.first_name, p.last_name`,
     ]);
     return Response.json({ packs, players });
   } catch (error) { return Response.json({ error: error instanceof Error ? error.message : "No se pudieron cargar los packs." }, { status: 403 }); }

@@ -13,7 +13,7 @@ export async function GET() {
       SELECT p.id::text AS id, p.first_name, p.last_name, p.nickname, p.email,
         COALESCE(c.balance, 0)::int AS balance
       FROM profiles p LEFT JOIN player_credits c ON c.player_id = p.id
-      WHERE p.role = 'player' ORDER BY p.first_name, p.last_name
+      WHERE p.role IN ('player', 'organizer', 'admin') ORDER BY p.first_name, p.last_name
     `;
     return Response.json({ players });
   } catch (error) {

@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export async function GET() {
   try {
     await requireAdministrator(); await ensurePlayerFields();
-    const players = await adminDatabase()`SELECT id::text, first_name, last_name, nickname, email, phone, club, auto_level, cantera_level, created_at FROM profiles WHERE role = 'player' ORDER BY first_name, last_name`;
+    const players = await adminDatabase()`SELECT id::text, first_name, last_name, nickname, email, phone, club, auto_level, cantera_level, role, created_at FROM profiles WHERE role IN ('player', 'organizer', 'admin') ORDER BY first_name, last_name`;
     return Response.json({ players });
   } catch (error) { return Response.json({ error: error instanceof Error ? error.message : "No se pudieron cargar las jugadoras." }, { status: 403 }); }
 }
