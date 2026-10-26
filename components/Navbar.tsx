@@ -148,8 +148,8 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
       ========================= */}
 
       <div
-        className={`overflow-hidden transition-all duration-500 lg:hidden ${
-          menuOpen ? "max-h-[600px]" : "max-h-0"
+        className={`transition-all duration-500 lg:hidden ${
+          menuOpen ? "max-h-[calc(100svh-6rem)] overflow-y-auto" : "max-h-0 overflow-hidden"
         } ${
           dark
             ? "bg-zinc-950"
