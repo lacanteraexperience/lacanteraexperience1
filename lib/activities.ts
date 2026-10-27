@@ -9,6 +9,14 @@ export async function ensureActivitySchema() {
   await sql.query("ALTER TABLE activities ADD COLUMN IF NOT EXISTS capacity INTEGER NOT NULL DEFAULT 10");
   await sql.query("ALTER TABLE activities ADD COLUMN IF NOT EXISTS minimum INTEGER NOT NULL DEFAULT 1");
   await sql.query("ALTER TABLE activities ADD COLUMN IF NOT EXISTS rules TEXT");
+  await sql.query("UPDATE activities a SET title = CASE WHEN a.title IS NULL OR btrim(a.title) = '' OR lower(a.title) = 'partido' THEN CONCAT(p.name, ' - ', UPPER(f.name)) ELSE a.title END, rules = CASE WHEN a.rules IS NULL OR btrim(a.rules) = '' THEN CASE WHEN f.name LIKE '5vs5%' OR f.name = '6vs6' THEN E'Llegá 15 minutos antes.\\nTraé camiseta blanca o negra.\\nJuego limpio y respeto ante todo.\\nCambios libres y rotativos durante el partido.' WHEN f.name LIKE '7vs7%' OR f.name = '8vs8' THEN E'Llegá 15 minutos antes.\\nTraé camiseta blanca o negra.\\nJuego limpio y respeto ante todo.\\nCambios libres. Respetá el formato, los tiempos y las indicaciones de la organización.' ELSE E'Llegá 15 minutos antes.\\nTraé camiseta blanca o negra.\\nJuego limpio y respeto ante todo.\\nCambios según el formato y las indicaciones de la organización.' END ELSE a.rules END FROM pitches p JOIN activity_formats f ON f.id = a.format_id WHERE a.pitch_id = p.id AND ((a.title IS NULL OR btrim(a.title) = '' OR lower(a.title) = 'partido') OR a.rules IS NULL OR btrim(a.rules) = '')");
+}
+
+export function defaultRulesForFormat(formatName: string) {
+  const base = "Llegá 15 minutos antes.\nTraé camiseta blanca o negra.\nJuego limpio y respeto ante todo.";
+  if (formatName.startsWith("5vs5") || formatName === "6vs6") return `${base}\nCambios libres y rotativos durante el partido.`;
+  if (formatName.startsWith("7vs7") || formatName === "8vs8") return `${base}\nCambios libres. Respetá el formato, los tiempos y las indicaciones de la organización.`;
+  return `${base}\nCambios según el formato y las indicaciones de la organización.`;
 }
 
 export async function activitiesWithCounts(status?: "admin" | "public") {

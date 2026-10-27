@@ -7,11 +7,12 @@ export async function GET() {
   try {
     await requireAdministrator(); await ensureFinanceSchema();
     const sql = adminDatabase();
-    const [entries, totals] = await Promise.all([
-      sql`SELECT id::text, entry_date, kind, concept, category, amount_cents, note FROM financial_entries ORDER BY entry_date DESC, created_at DESC`,
+    const [entries, totals, paymentTotals] = await Promise.all([
+      sql`SELECT id::text, entry_date, kind, concept, category, amount_cents, note, payment_method FROM financial_entries ORDER BY entry_date DESC, created_at DESC`,
       sql`SELECT COALESCE(SUM(amount_cents) FILTER (WHERE kind = 'income'), 0)::int AS income, COALESCE(SUM(amount_cents) FILTER (WHERE kind = 'expense'), 0)::int AS expense FROM financial_entries`,
+      sql`SELECT COALESCE(SUM(amount_cents) FILTER (WHERE kind = 'income' AND payment_method = 'cash'), 0)::int AS cash, COALESCE(SUM(amount_cents) FILTER (WHERE kind = 'income' AND payment_method = 'card'), 0)::int AS card, COALESCE(SUM(amount_cents) FILTER (WHERE kind = 'income' AND payment_method = 'transfer'), 0)::int AS transfer FROM financial_entries`,
     ]);
-    return Response.json({ entries, totals: totals[0] });
+    return Response.json({ entries, totals: totals[0], paymentTotals: paymentTotals[0] });
   } catch (error) { return Response.json({ error: error instanceof Error ? error.message : "No se pudo cargar la economía." }, { status: 403 }); }
 }
 

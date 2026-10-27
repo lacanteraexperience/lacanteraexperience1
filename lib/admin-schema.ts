@@ -44,4 +44,5 @@ export async function ensureFinanceSchema() {
     category TEXT NOT NULL, amount_cents INTEGER NOT NULL CHECK (amount_cents > 0), note TEXT,
     created_by UUID REFERENCES profiles(id) ON DELETE SET NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`);
+  await sql.query("ALTER TABLE financial_entries ADD COLUMN IF NOT EXISTS payment_method TEXT");
 }

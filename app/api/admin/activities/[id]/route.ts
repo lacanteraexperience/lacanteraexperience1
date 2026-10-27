@@ -1,5 +1,5 @@
 import { requireAdministrator } from "@/lib/current-profile";
-import { ensureActivitySchema } from "@/lib/activities";
+import { defaultRulesForFormat, ensureActivitySchema } from "@/lib/activities";
 import { ensureCreditSchema } from "@/lib/credits";
 import { adminDatabase } from "@/lib/admin-schema";
 export const runtime = "nodejs";
@@ -16,7 +16,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     }
     const pitchId = typeof body.pitchId === "string" ? body.pitchId : "", formatId = typeof body.formatId === "string" ? body.formatId : "", startsAt = typeof body.startsAt === "string" ? body.startsAt : "", endsAt = typeof body.endsAt === "string" ? body.endsAt : "", rules = typeof body.rules === "string" ? body.rules.trim() : "";
     if (!pitchId || !formatId || !startsAt || !endsAt || new Date(endsAt) <= new Date(startsAt)) return Response.json({ error: "Revisá pista, formato y horarios." }, { status: 400 });
-    const rows = await sql`UPDATE activities a SET title = CONCAT(p.name, ' · ', f.name), starts_at = ${startsAt}::timestamptz, ends_at = ${endsAt}::timestamptz, pitch_id = p.id, format_id = f.id, field_name = p.name, capacity = f.capacity, minimum = f.minimum, rules = ${rules || null} FROM pitches p CROSS JOIN activity_formats f WHERE a.id = ${id}::uuid AND p.id = ${pitchId}::uuid AND f.id = ${formatId}::uuid AND a.status = 'published' RETURNING a.id::text`;
+    const format = await sql`SELECT name FROM activity_formats WHERE id = ${formatId}::uuid`; if (!format[0]) return Response.json({ error: "El formato no existe." }, { status: 400 });
+    const rows = await sql`UPDATE activities a SET title = CONCAT(p.name, ' - ', UPPER(f.name)), starts_at = ${startsAt}::timestamptz, ends_at = ${endsAt}::timestamptz, pitch_id = p.id, format_id = f.id, field_name = p.name, capacity = f.capacity, minimum = f.minimum, rules = ${rules || defaultRulesForFormat(String(format[0].name))} FROM pitches p CROSS JOIN activity_formats f WHERE a.id = ${id}::uuid AND p.id = ${pitchId}::uuid AND f.id = ${formatId}::uuid AND a.status = 'published' RETURNING a.id::text`;
     if (!rows[0]) return Response.json({ error: "No se pudo editar: verificá los datos o el estado del partido." }, { status: 400 });
     return Response.json({ updated: true });
   } catch (error) { return Response.json({ error: error instanceof Error ? error.message : "No se pudo actualizar el partido." }, { status: 400 }); }
