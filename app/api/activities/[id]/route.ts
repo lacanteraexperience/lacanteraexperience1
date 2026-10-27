@@ -15,6 +15,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     if (!activities[0]) return Response.json({ error: "El partido no está disponible." }, { status: 404 });
     if (!profile) return Response.json({ activity: activities[0], signedIn: false });
     const players = await sql`SELECT p.first_name, p.last_name, p.avatar_url FROM registrations r JOIN profiles p ON p.id = r.player_id WHERE r.activity_id = ${id}::uuid AND r.status = 'confirmed' ORDER BY p.first_name, p.last_name`;
-    return Response.json({ activity: activities[0], players, signedIn: true });
+    const registration = await sql`SELECT status FROM registrations WHERE activity_id = ${id}::uuid AND player_id = ${profile.id}::uuid LIMIT 1`;
+    return Response.json({ activity: activities[0], players, signedIn: true, registered: registration[0]?.status === "confirmed" });
   } catch (error) { return Response.json({ error: error instanceof Error ? error.message : "No se pudo cargar el partido." }, { status: 400 }); }
 }
