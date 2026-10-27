@@ -63,4 +63,5 @@ export async function ensureCommunicationSchema() {
     created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`);
+  await sql.query("ALTER TABLE player_sanctions ADD COLUMN IF NOT EXISTS automatic BOOLEAN NOT NULL DEFAULT false");
 }
