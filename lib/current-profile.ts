@@ -10,7 +10,7 @@ function normalizeEmail(value: string) {
   return `${localPart}@${domain}`;
 }
 
-export type CurrentProfile = { id: string; authUserId: string; email: string | null; role: "player" | "organizer" | "admin" };
+export type CurrentProfile = { id: string; authUserId: string; email: string | null; role: "player" | "organizer" | "admin"; firstName: string; lastName: string; nickname: string | null; phone: string | null; club: string | null; autoLevel: string | null; canteraLevel: string | null };
 
 export async function currentProfile(): Promise<CurrentProfile | null> {
   const { userId } = await auth();
@@ -21,36 +21,37 @@ export async function currentProfile(): Promise<CurrentProfile | null> {
   const user = await currentUser();
   const emails = user?.emailAddresses.map(({ emailAddress }) => emailAddress.toLowerCase()) ?? [];
   const email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() ?? emails[0] ?? null;
-  const firstName = user?.firstName?.trim() || "Jugadora";
-  const lastName = user?.lastName?.trim() || "";
+  const clerkFirstName = user?.firstName?.trim() || "";
+  const clerkLastName = user?.lastName?.trim() || "";
+  const firstName = clerkFirstName || "Jugadora";
+  const lastName = clerkLastName || "";
   const sql = neon(databaseUrl);
   const role = emails.map(normalizeEmail).includes(normalizeEmail(initialAdminEmail)) ? "admin" : "player";
   if (email) {
     const linked = await sql`
-      UPDATE profiles SET auth_user_id = ${userId}, first_name = ${firstName}, last_name = ${lastName},
+      UPDATE profiles SET auth_user_id = ${userId}, first_name = CASE WHEN ${clerkFirstName} <> '' THEN ${clerkFirstName} ELSE first_name END, last_name = CASE WHEN ${clerkLastName} <> '' THEN ${clerkLastName} ELSE last_name END,
         role = CASE WHEN ${role} = 'admin' THEN 'admin' ELSE role END
       WHERE auth_user_id IS NULL AND lower(email) = ${email}
-      RETURNING id::text, auth_user_id, email, role
+      RETURNING id::text, auth_user_id, email, role, first_name, last_name, nickname, phone, club, auto_level, cantera_level
     `;
-    if (linked[0]) return { id: String(linked[0].id), authUserId: String(linked[0].auth_user_id), email: typeof linked[0].email === "string" ? linked[0].email : null, role: linked[0].role === "admin" || linked[0].role === "organizer" ? linked[0].role : "player" };
+    if (linked[0]) return mapProfile(linked[0]);
   }
   const rows = await sql`
     INSERT INTO profiles (auth_user_id, first_name, last_name, email, role)
     VALUES (${userId}, ${firstName}, ${lastName}, ${email}, ${role})
     ON CONFLICT (auth_user_id) DO UPDATE
-      SET first_name = EXCLUDED.first_name,
-          last_name = EXCLUDED.last_name,
+      SET first_name = CASE WHEN ${clerkFirstName} <> '' THEN EXCLUDED.first_name ELSE profiles.first_name END,
+          last_name = CASE WHEN ${clerkLastName} <> '' THEN EXCLUDED.last_name ELSE profiles.last_name END,
           email = COALESCE(EXCLUDED.email, profiles.email),
           role = CASE WHEN EXCLUDED.role = 'admin' THEN 'admin' ELSE profiles.role END
-    RETURNING id::text, auth_user_id, email, role
+    RETURNING id::text, auth_user_id, email, role, first_name, last_name, nickname, phone, club, auto_level, cantera_level
   `;
   const profile = rows[0];
-  return profile ? {
-    id: String(profile.id),
-    authUserId: String(profile.auth_user_id),
-    email: typeof profile.email === "string" ? profile.email : null,
-    role: profile.role === "admin" || profile.role === "organizer" ? profile.role : "player",
-  } : null;
+  return profile ? mapProfile(profile) : null;
+}
+
+function mapProfile(profile: Record<string, unknown>): CurrentProfile {
+  return { id: String(profile.id), authUserId: String(profile.auth_user_id), email: typeof profile.email === "string" ? profile.email : null, role: profile.role === "admin" || profile.role === "organizer" ? profile.role : "player", firstName: typeof profile.first_name === "string" ? profile.first_name : "Jugadora", lastName: typeof profile.last_name === "string" ? profile.last_name : "", nickname: typeof profile.nickname === "string" ? profile.nickname : null, phone: typeof profile.phone === "string" ? profile.phone : null, club: typeof profile.club === "string" ? profile.club : null, autoLevel: typeof profile.auto_level === "string" ? profile.auto_level : null, canteraLevel: typeof profile.cantera_level === "string" ? profile.cantera_level : null };
 }
 
 export async function requireAdministrator() {
