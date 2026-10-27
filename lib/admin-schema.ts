@@ -46,3 +46,21 @@ export async function ensureFinanceSchema() {
   )`);
   await sql.query("ALTER TABLE financial_entries ADD COLUMN IF NOT EXISTS payment_method TEXT");
 }
+
+export async function ensureCommunicationSchema() {
+  const sql = adminDatabase();
+  await sql.query(`CREATE TABLE IF NOT EXISTS admin_notices (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(), title TEXT NOT NULL, body TEXT NOT NULL,
+    audience TEXT NOT NULL CHECK (audience IN ('all_players', 'match_players')),
+    activity_id UUID REFERENCES activities(id) ON DELETE SET NULL,
+    created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`);
+  await sql.query(`CREATE TABLE IF NOT EXISTS player_sanctions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(), player_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    kind TEXT NOT NULL CHECK (kind IN ('alert', 'suspension', 'note')), reason TEXT NOT NULL,
+    starts_on DATE, ends_on DATE, active BOOLEAN NOT NULL DEFAULT true,
+    created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`);
+}
