@@ -1,12 +1,14 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SharedMatchExplorer from "@/components/SharedMatchExplorer";
-import { currentProfile } from "@/lib/current-profile";
+import { currentProfile, profileNeedsOnboarding } from "@/lib/current-profile";
+import { redirect } from "next/navigation";
 
 export const metadata = { title: "Jugar | La Cantera Experience" };
 
 export default async function JugarPage() {
-  await currentProfile();
+  const profile = await currentProfile();
+  if (profile && profileNeedsOnboarding(profile)) redirect("/completar-perfil");
 
   return (
     <main className="min-h-screen bg-stone-50 pt-28 text-gray-950">

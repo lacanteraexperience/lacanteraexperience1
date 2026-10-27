@@ -12,6 +12,10 @@ function normalizeEmail(value: string) {
 
 export type CurrentProfile = { id: string; authUserId: string; email: string | null; role: "player" | "organizer" | "admin"; firstName: string; lastName: string; nickname: string | null; phone: string | null; club: string | null; autoLevel: string | null; canteraLevel: string | null };
 
+export function profileNeedsOnboarding(profile: CurrentProfile) {
+  return !profile.firstName || profile.firstName === "Jugadora" || !profile.lastName || !profile.nickname || !profile.phone || !profile.autoLevel;
+}
+
 export async function currentProfile(): Promise<CurrentProfile | null> {
   const { userId } = await auth();
   if (!userId) return null;

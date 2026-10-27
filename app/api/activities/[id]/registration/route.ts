@@ -1,4 +1,4 @@
-import { currentProfile } from "@/lib/current-profile";
+import { currentProfile, profileNeedsOnboarding } from "@/lib/current-profile";
 import { ensureCreditSchema } from "@/lib/credits";
 import { ensureActivitySchema } from "@/lib/activities";
 import { adminDatabase, ensureCommunicationSchema } from "@/lib/admin-schema";
@@ -7,7 +7,7 @@ const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-
 
 export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const profile = await currentProfile(); if (!profile) return Response.json({ error: "Iniciá sesión para inscribirte." }, { status: 401 });
+    const profile = await currentProfile(); if (!profile) return Response.json({ error: "Iniciá sesión para inscribirte." }, { status: 401 }); if (profileNeedsOnboarding(profile)) return Response.json({ error: "Completá tu perfil antes de inscribirte.", completeProfile: true }, { status: 403 });
     await ensureActivitySchema(); await ensureCreditSchema(); const { id } = await params; if (!uuid.test(id)) return Response.json({ error: "El partido no es válido." }, { status: 400 }); const sql = adminDatabase();
     await ensureCommunicationSchema();
     const blocked = await sql`SELECT ends_on FROM player_sanctions WHERE player_id = ${profile.id}::uuid AND kind = 'suspension' AND active = true AND CURRENT_DATE BETWEEN starts_on AND ends_on ORDER BY ends_on DESC LIMIT 1`;
