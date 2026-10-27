@@ -34,6 +34,7 @@ export async function ensureFormatSchema() {
 export async function ensurePlayerFields() {
   const sql = adminDatabase();
   await sql.query("ALTER TABLE profiles ADD COLUMN IF NOT EXISTS club TEXT");
+  await sql.query("ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT");
 }
 
 export async function ensureFinanceSchema() {

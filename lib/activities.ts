@@ -9,14 +9,25 @@ export async function ensureActivitySchema() {
   await sql.query("ALTER TABLE activities ADD COLUMN IF NOT EXISTS capacity INTEGER NOT NULL DEFAULT 10");
   await sql.query("ALTER TABLE activities ADD COLUMN IF NOT EXISTS minimum INTEGER NOT NULL DEFAULT 1");
   await sql.query("ALTER TABLE activities ADD COLUMN IF NOT EXISTS rules TEXT");
-  await sql.query("UPDATE activities a SET title = CASE WHEN a.title IS NULL OR btrim(a.title) = '' OR lower(a.title) = 'partido' THEN CONCAT(p.name, ' - ', UPPER(f.name)) ELSE a.title END, rules = CASE WHEN a.rules IS NULL OR btrim(a.rules) = '' THEN CASE WHEN f.name LIKE '5vs5%' OR f.name = '6vs6' THEN E'Llegá 15 minutos antes.\\nTraé camiseta blanca o negra.\\nJuego limpio y respeto ante todo.\\nCambios libres y rotativos durante el partido.' WHEN f.name LIKE '7vs7%' OR f.name = '8vs8' THEN E'Llegá 15 minutos antes.\\nTraé camiseta blanca o negra.\\nJuego limpio y respeto ante todo.\\nCambios libres. Respetá el formato, los tiempos y las indicaciones de la organización.' ELSE E'Llegá 15 minutos antes.\\nTraé camiseta blanca o negra.\\nJuego limpio y respeto ante todo.\\nCambios según el formato y las indicaciones de la organización.' END ELSE a.rules END FROM pitches p, activity_formats f WHERE a.pitch_id = p.id AND f.id = a.format_id AND ((a.title IS NULL OR btrim(a.title) = '' OR lower(a.title) = 'partido') OR a.rules IS NULL OR btrim(a.rules) = '')");
+  await sql.query("UPDATE activities a SET title = CASE WHEN a.title IS NULL OR btrim(a.title) = '' OR lower(a.title) = 'partido' THEN CONCAT(p.name, ' - ', UPPER(f.name)) ELSE a.title END FROM pitches p, activity_formats f WHERE a.pitch_id = p.id AND f.id = a.format_id AND (a.title IS NULL OR btrim(a.title) = '' OR lower(a.title) = 'partido')");
+  for (const formatName of ["5vs5+suplentes", "5vs5", "6vs6", "7vs7", "8vs8", "7vs7+suplentes", "11vs11", "11vs11+suplentes"]) {
+    const legacy = legacyRulesForFormat(formatName);
+    await sql`UPDATE activities a SET rules = ${defaultRulesForFormat(formatName)} FROM activity_formats f WHERE a.format_id = f.id AND f.name = ${formatName} AND (a.rules IS NULL OR btrim(a.rules) = '' OR a.rules = ${legacy})`;
+  }
 }
 
-export function defaultRulesForFormat(formatName: string) {
+function legacyRulesForFormat(formatName: string) {
   const base = "Llegá 15 minutos antes.\nTraé camiseta blanca o negra.\nJuego limpio y respeto ante todo.";
   if (formatName.startsWith("5vs5") || formatName === "6vs6") return `${base}\nCambios libres y rotativos durante el partido.`;
   if (formatName.startsWith("7vs7") || formatName === "8vs8") return `${base}\nCambios libres. Respetá el formato, los tiempos y las indicaciones de la organización.`;
   return `${base}\nCambios según el formato y las indicaciones de la organización.`;
+}
+
+export function defaultRulesForFormat(formatName: string) {
+  const base = "Llegá 15 minutos antes para poder empezar a tiempo.\nTraé camiseta blanca o negra, agua y la indumentaria deportiva adecuada.\nJuego limpio y respeto hacia compañeras, rivales, organización, personal e instalaciones.\nAvisá cuanto antes cualquier baja o incidencia.\nColaborá con las rotaciones y con equipos equilibrados.\nRespetá las normas de la pista y las indicaciones de la organizadora.\nAnte un conflicto, pará, hablalo con calma y pedí apoyo a la organizadora.\nNo se permiten entradas peligrosas, fuerza innecesaria, insultos, amenazas ni actitudes agresivas.";
+  if (formatName.startsWith("5vs5") || formatName === "6vs6") return `${base}\nCambios libres y rotativos durante el partido.\nEn formatos reducidos no se permiten botas de fútbol 7 o 11 con tacos: usá multitaco o zapatillas de suela lisa.`;
+  if (formatName.startsWith("7vs7") || formatName === "8vs8") return `${base}\nCambios libres. Respetá el formato, los tiempos y las indicaciones de la organización.\nUsá el calzado adecuado para la pista.`;
+  return `${base}\nCambios según el formato y las indicaciones de la organización.\nUsá el calzado adecuado para la pista.`;
 }
 
 export async function activitiesWithCounts(status?: "admin" | "public") {
