@@ -1,3 +1,5 @@
+import { ArrowRight } from "lucide-react";
+
 type ExperienceBlockProps = {
   badge: string;
   title: string;
@@ -64,6 +66,14 @@ function ExperienceBlock({
           ))}
 
         </div>
+
+        <a
+          href="/#contacto"
+          className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-gray-900 transition-colors duration-300 hover:text-lime-700"
+        >
+          <span>Descubrir experiencia</span>
+          <ArrowRight className="h-4 w-4" />
+        </a>
 
       </div>
     </article>
@@ -186,5 +196,3 @@ export default function Experiences() {
     </section>
   );
 }
-import { ArrowRight } from "lucide-react";
-
