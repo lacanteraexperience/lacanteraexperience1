@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { HiBars3, HiXMark } from "react-icons/hi2";
 import { SignOutButton, useUser } from "@clerk/nextjs";
+import { Bell } from "lucide-react";
 
 const links = [
   { href: "/#inicio", label: "Inicio" },
@@ -20,6 +21,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [profileRole, setProfileRole] = useState<"player" | "organizer" | "admin" | null>(null);
+  const [unreadNotices, setUnreadNotices] = useState(0);
   const { isSignedIn, user } = useUser();
   const pathname = usePathname(); const router = useRouter();
   const isAdministrator = profileRole === "admin" || (user?.emailAddresses.some(({ emailAddress }) => {
@@ -29,6 +31,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
   }) ?? false);
   const profileInitials = `${user?.firstName?.slice(0, 1) ?? ""}${user?.lastName?.slice(0, 1) ?? ""}`.trim().toUpperCase() || user?.primaryEmailAddress?.emailAddress?.slice(0, 1).toUpperCase() || "LC";
   const profileLink = <Link href="/mi-perfil" aria-label="Ir a mi perfil" title="Mi perfil" className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-lime-500 text-sm font-black text-black ring-2 ring-white/70 transition hover:scale-105">{user?.hasImage ? <img src={user.imageUrl} alt="Foto de perfil" className="h-full w-full object-cover" /> : profileInitials}</Link>;
+  const noticesLink = <Link href="/notificaciones" aria-label="Ver avisos" title="Avisos" className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/10"><Bell className="h-5 w-5" />{unreadNotices ? <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-lime-400 px-1 text-[10px] font-black text-black">{unreadNotices > 9 ? "9+" : unreadNotices}</span> : null}</Link>;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,6 +62,11 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
       })
       .catch(() => setProfileRole(null));
   }, [isSignedIn, pathname, router]);
+
+  useEffect(() => {
+    if (!isSignedIn) { setUnreadNotices(0); return; }
+    void fetch("/api/notifications", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).then((data: { unreadCount?: number } | null) => setUnreadNotices(data?.unreadCount ?? 0)).catch(() => setUnreadNotices(0));
+  }, [isSignedIn, pathname]);
 
   return (
     <header
@@ -124,7 +132,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
               Solicita tu experiencia
             </Link>
             <Link href="/jugar" className="text-sm font-semibold text-white transition hover:text-lime-300">Jugar</Link>
-            {isSignedIn ? <><Link href="/mis-partidos" className="text-sm font-semibold text-white transition hover:text-lime-300">Mis partidos</Link><Link href="/mi-saldo" className="text-sm font-semibold text-white transition hover:text-lime-300">Mi saldo</Link>{isAdministrator && <Link href="/administracion" className="rounded-full bg-lime-500 px-4 py-2 text-sm font-bold text-black">Administración</Link>}{profileLink}<SignOutButton><button type="button" className="text-xs font-semibold text-white/80 transition hover:text-lime-300">Salir</button></SignOutButton></> : <a href="/iniciar-sesion" className="text-sm font-semibold text-white transition hover:text-lime-300">Inicia sesión / Regístrate</a>}
+            {isSignedIn ? <><Link href="/mis-partidos" className="text-sm font-semibold text-white transition hover:text-lime-300">Mis partidos</Link><Link href="/mi-saldo" className="text-sm font-semibold text-white transition hover:text-lime-300">Mi saldo</Link>{isAdministrator && <Link href="/administracion" className="rounded-full bg-lime-500 px-4 py-2 text-sm font-bold text-black">Administración</Link>}{noticesLink}{profileLink}<SignOutButton><button type="button" className="text-xs font-semibold text-white/80 transition hover:text-lime-300">Salir</button></SignOutButton></> : <a href="/iniciar-sesion" className="text-sm font-semibold text-white transition hover:text-lime-300">Inicia sesión / Regístrate</a>}
           </div>
 
         </nav>
@@ -134,7 +142,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
         ========================= */}
 
         <div className="flex items-center gap-3 lg:hidden">
-          {isSignedIn ? profileLink : null}
+          {isSignedIn ? <>{noticesLink}{profileLink}</> : null}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
@@ -193,7 +201,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
           >
             Solicita tu experiencia
           </Link>
-          <section className="mt-3 rounded-2xl bg-lime-950/90 p-3 ring-1 ring-lime-400/50"><p className="px-2 pb-2 text-xs font-black uppercase tracking-[0.16em] text-lime-300">La Cantera Play</p><Link href="/jugar" onClick={() => setMenuOpen(false)} className="block rounded-xl bg-white px-4 py-3 text-center font-bold text-gray-950 transition hover:bg-lime-100">Jugar</Link>{isSignedIn ? <><Link href="/mis-partidos" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-xl px-4 py-3 text-center font-medium text-white transition hover:bg-white/10">Mis partidos</Link><Link href="/mi-saldo" onClick={() => setMenuOpen(false)} className="block rounded-xl px-4 py-3 text-center font-medium text-white transition hover:bg-white/10">Mi saldo</Link>{isAdministrator && <Link href="/administracion" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-xl bg-lime-500 px-4 py-3 text-center font-bold text-black">Administración</Link>}<SignOutButton><button type="button" onClick={() => setMenuOpen(false)} className="mt-2 block w-full rounded-xl px-4 py-3 text-center font-medium text-white transition hover:bg-white/10">Cerrar sesión</button></SignOutButton></> : <Link href="/iniciar-sesion" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-xl px-4 py-3 text-center font-medium text-white transition hover:bg-white/10">Inicia sesión / Regístrate</Link>}</section>
+          <section className="mt-3 rounded-2xl bg-lime-950/90 p-3 ring-1 ring-lime-400/50"><p className="px-2 pb-2 text-xs font-black uppercase tracking-[0.16em] text-lime-300">La Cantera Play</p><Link href="/jugar" onClick={() => setMenuOpen(false)} className="block rounded-xl bg-white px-4 py-3 text-center font-bold text-gray-950 transition hover:bg-lime-100">Jugar</Link>{isSignedIn ? <><Link href="/mis-partidos" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-xl px-4 py-3 text-center font-medium text-white transition hover:bg-white/10">Mis partidos</Link><Link href="/notificaciones" onClick={() => setMenuOpen(false)} className="block rounded-xl px-4 py-3 text-center font-medium text-white transition hover:bg-white/10">Avisos{unreadNotices ? ` · ${unreadNotices}` : ""}</Link><Link href="/mi-saldo" onClick={() => setMenuOpen(false)} className="block rounded-xl px-4 py-3 text-center font-medium text-white transition hover:bg-white/10">Mi saldo</Link>{isAdministrator && <Link href="/administracion" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-xl bg-lime-500 px-4 py-3 text-center font-bold text-black">Administración</Link>}<SignOutButton><button type="button" onClick={() => setMenuOpen(false)} className="mt-2 block w-full rounded-xl px-4 py-3 text-center font-medium text-white transition hover:bg-white/10">Cerrar sesión</button></SignOutButton></> : <Link href="/iniciar-sesion" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-xl px-4 py-3 text-center font-medium text-white transition hover:bg-white/10">Inicia sesión / Regístrate</Link>}</section>
 
 
         </nav>

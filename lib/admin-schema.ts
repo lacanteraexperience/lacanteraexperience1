@@ -65,4 +65,10 @@ export async function ensureCommunicationSchema() {
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`);
   await sql.query("ALTER TABLE player_sanctions ADD COLUMN IF NOT EXISTS automatic BOOLEAN NOT NULL DEFAULT false");
+  await sql.query(`CREATE TABLE IF NOT EXISTS notice_reads (
+    notice_id UUID NOT NULL REFERENCES admin_notices(id) ON DELETE CASCADE,
+    player_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    read_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (notice_id, player_id)
+  )`);
 }
