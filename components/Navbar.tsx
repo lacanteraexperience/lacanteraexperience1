@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { HiBars3, HiXMark } from "react-icons/hi2";
 import { SignOutButton, useUser } from "@clerk/nextjs";
 
@@ -20,6 +21,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [profileRole, setProfileRole] = useState<"player" | "organizer" | "admin" | null>(null);
   const { isSignedIn, user } = useUser();
+  const pathname = usePathname(); const router = useRouter();
   const isAdministrator = profileRole === "admin" || (user?.emailAddresses.some(({ emailAddress }) => {
     const [localPart, domain] = emailAddress.trim().toLowerCase().split("@");
     const normalized = (domain === "gmail.com" || domain === "googlemail.com") ? `${localPart?.split("+")[0].replaceAll(".", "")}@gmail.com` : emailAddress.trim().toLowerCase();
@@ -49,9 +51,14 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
     }
     void fetch("/api/perfil")
       .then((response) => response.ok ? response.json() : null)
-      .then((data: { profile?: { role?: "player" | "organizer" | "admin" } } | null) => setProfileRole(data?.profile?.role ?? null))
+      .then((data: { profile?: { role?: "player" | "organizer" | "admin"; firstName?: string; lastName?: string; nickname?: string | null; phone?: string | null; autoLevel?: string | null } } | null) => {
+        setProfileRole(data?.profile?.role ?? null);
+        const profile = data?.profile;
+        const incomplete = !profile?.firstName || profile.firstName === "Jugadora" || !profile.lastName || !profile.nickname || !profile.phone || !profile.autoLevel;
+        if (incomplete && pathname !== "/completar-perfil") router.replace("/completar-perfil");
+      })
       .catch(() => setProfileRole(null));
-  }, [isSignedIn]);
+  }, [isSignedIn, pathname, router]);
 
   return (
     <header
