@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export async function GET() {
   try {
     await requireAdministrator(); await ensureCommunicationSchema();
-    const notices = await adminDatabase()`SELECT n.id::text, n.title, n.body, n.audience, n.activity_id::text, n.created_at, a.title AS activity_title FROM admin_notices n LEFT JOIN activities a ON a.id = n.activity_id ORDER BY n.created_at DESC`;
+    const notices = await adminDatabase()`SELECT n.id::text, n.title, n.body, n.audience, n.activity_id::text, n.created_at, a.title AS activity_title, a.starts_at AS activity_starts_at FROM admin_notices n LEFT JOIN activities a ON a.id = n.activity_id ORDER BY n.created_at DESC`;
     return Response.json({ notices });
   } catch (error) { return Response.json({ error: error instanceof Error ? error.message : "No se pudieron cargar los avisos." }, { status: 403 }); }
 }
