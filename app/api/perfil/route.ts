@@ -18,11 +18,11 @@ export async function PATCH(request: Request) {
     const profile = await currentProfile();
     if (!profile) return Response.json({ error: "Iniciá sesión para editar tu perfil." }, { status: 401 });
     await ensurePlayerFields();
-    const body = await request.json() as { firstName?: unknown; lastName?: unknown; nickname?: unknown; phone?: unknown; autoLevel?: unknown };
+    const body = await request.json() as { firstName?: unknown; lastName?: unknown; nickname?: unknown; phone?: unknown; autoLevel?: unknown; communityAccepted?: unknown };
     const text = (value: unknown, limit: number) => typeof value === "string" ? value.trim().slice(0, limit) : "";
     const firstName = text(body.firstName, 80), lastName = text(body.lastName, 120), nickname = text(body.nickname, 80), phone = text(body.phone, 50), autoLevel = text(body.autoLevel, 40);
-    if (!firstName || !lastName || !nickname || !phone || !autoLevel) return Response.json({ error: "Nombre, apellido, apodo, teléfono y nivel de juego son obligatorios." }, { status: 400 });
-    await adminDatabase()`UPDATE profiles SET first_name = ${firstName}, last_name = ${lastName}, nickname = ${nickname || null}, phone = ${phone || null}, auto_level = ${autoLevel || null} WHERE id = ${profile.id}::uuid`;
+    if (!firstName || !lastName || !nickname || !phone || !autoLevel || (!profile.communityDeclarationAt && body.communityAccepted !== true)) return Response.json({ error: "Completá los datos obligatorios y confirmá la declaración de comunidad." }, { status: 400 });
+    await adminDatabase()`UPDATE profiles SET first_name = ${firstName}, last_name = ${lastName}, nickname = ${nickname || null}, phone = ${phone || null}, auto_level = ${autoLevel || null}, community_declaration_at = CASE WHEN ${body.communityAccepted === true} THEN COALESCE(community_declaration_at, now()) ELSE community_declaration_at END WHERE id = ${profile.id}::uuid`;
     return Response.json({ updated: true });
   } catch (error) { return Response.json({ error: error instanceof Error ? error.message : "No se pudo actualizar el perfil." }, { status: 400 }); }
 }

@@ -35,6 +35,9 @@ export async function ensurePlayerFields() {
   const sql = adminDatabase();
   await sql.query("ALTER TABLE profiles ADD COLUMN IF NOT EXISTS club TEXT");
   await sql.query("ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT");
+  await sql.query("ALTER TABLE profiles ADD COLUMN IF NOT EXISTS community_declaration_at TIMESTAMPTZ");
+  await sql.query("ALTER TABLE profiles ADD COLUMN IF NOT EXISTS membership_status TEXT NOT NULL DEFAULT 'pending'");
+  await sql.query("UPDATE profiles SET membership_status = 'approved' WHERE role = 'admin' AND membership_status = 'pending'");
 }
 
 export async function ensureFinanceSchema() {
