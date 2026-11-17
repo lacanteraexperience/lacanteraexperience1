@@ -9,6 +9,7 @@ export async function ensureActivitySchema() {
   await sql.query("ALTER TABLE activities ADD COLUMN IF NOT EXISTS capacity INTEGER NOT NULL DEFAULT 10");
   await sql.query("ALTER TABLE activities ADD COLUMN IF NOT EXISTS minimum INTEGER NOT NULL DEFAULT 1");
   await sql.query("ALTER TABLE activities ADD COLUMN IF NOT EXISTS rules TEXT");
+  await sql.query("ALTER TABLE registrations ADD COLUMN IF NOT EXISTS cancelled_at TIMESTAMPTZ");
   await sql.query("UPDATE activities a SET title = CASE WHEN a.title IS NULL OR btrim(a.title) = '' OR lower(a.title) = 'partido' THEN CONCAT(p.name, ' - ', UPPER(f.name)) ELSE a.title END FROM pitches p, activity_formats f WHERE a.pitch_id = p.id AND f.id = a.format_id AND (a.title IS NULL OR btrim(a.title) = '' OR lower(a.title) = 'partido')");
   for (const formatName of ["5vs5+suplentes", "5vs5", "6vs6", "7vs7", "8vs8", "7vs7+suplentes", "11vs11", "11vs11+suplentes"]) {
     const [legacyShort, legacyDetailed] = legacyRulesForFormat(formatName);
