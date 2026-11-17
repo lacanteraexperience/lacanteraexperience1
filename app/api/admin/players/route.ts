@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export async function GET() {
   try {
     await requireAdministrator(); await ensurePlayerFields(); await ensureCommunicationSchema();
-    const players = await adminDatabase()`SELECT p.id::text, p.first_name, p.last_name, p.nickname, p.email, p.phone, p.auto_level, p.cantera_level, p.role, p.membership_status, p.community_declaration_at, p.created_at,
+    const players = await adminDatabase()`SELECT p.id::text, p.first_name, p.last_name, p.nickname, p.email, p.phone, p.auto_level, p.cantera_level, p.role, p.membership_status, p.community_declaration_at, p.authorization_requested_at, p.created_at,
       (SELECT COUNT(*)::int FROM player_sanctions s WHERE s.player_id = p.id AND s.kind = 'alert' AND s.active = true) AS active_alerts,
       (SELECT s.ends_on FROM player_sanctions s WHERE s.player_id = p.id AND s.kind = 'suspension' AND s.active = true AND CURRENT_DATE BETWEEN s.starts_on AND s.ends_on ORDER BY s.ends_on DESC LIMIT 1) AS suspension_until
       FROM profiles p WHERE p.role IN ('player', 'organizer', 'admin') ORDER BY p.first_name, p.last_name`;
@@ -30,12 +30,17 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   try {
     await requireAdministrator(); await ensurePlayerFields();
-    const body = await request.json() as { playerId?: unknown; canteraLevel?: unknown; membershipStatus?: unknown };
+    const body = await request.json() as { playerId?: unknown; canteraLevel?: unknown; membershipStatus?: unknown; requestAuthorization?: unknown };
     const playerId = typeof body.playerId === "string" ? body.playerId : "";
     const canteraLevel = typeof body.canteraLevel === "string" ? body.canteraLevel.trim() : "";
     const membershipStatus = body.membershipStatus === "pending" || body.membershipStatus === "approved" || body.membershipStatus === "blocked" || body.membershipStatus === "deleted" ? body.membershipStatus : null;
+    const requestAuthorization = body.requestAuthorization === true;
     if (!playerId || (canteraLevel && !["Principiante", "Intermedio", "Avanzado"].includes(canteraLevel))) return Response.json({ error: "Datos de nivel no válidos." }, { status: 400 });
-    const rows = membershipStatus ? await adminDatabase()`UPDATE profiles SET membership_status = ${membershipStatus} WHERE id = ${playerId}::uuid AND role <> 'admin' RETURNING id::text` : await adminDatabase()`UPDATE profiles SET cantera_level = ${canteraLevel || null} WHERE id = ${playerId}::uuid RETURNING id::text`;
+    const rows = requestAuthorization
+      ? await adminDatabase()`UPDATE profiles SET authorization_requested_at = now() WHERE id = ${playerId}::uuid AND role <> 'admin' AND membership_status = 'pending' RETURNING id::text`
+      : membershipStatus
+        ? await adminDatabase()`UPDATE profiles SET membership_status = ${membershipStatus}, authorization_requested_at = CASE WHEN ${membershipStatus} = 'approved' THEN NULL ELSE authorization_requested_at END WHERE id = ${playerId}::uuid AND role <> 'admin' RETURNING id::text`
+        : await adminDatabase()`UPDATE profiles SET cantera_level = ${canteraLevel || null} WHERE id = ${playerId}::uuid RETURNING id::text`;
     if (!rows[0]) return Response.json({ error: "La jugadora no existe." }, { status: 404 });
     return Response.json({ updated: true });
   } catch (error) { return Response.json({ error: error instanceof Error ? error.message : "No se pudo actualizar el nivel Cantera." }, { status: 400 }); }

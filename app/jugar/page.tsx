@@ -1,7 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SharedMatchExplorer from "@/components/SharedMatchExplorer";
-import { currentProfile, profileCanUsePlay, profileNeedsOnboarding } from "@/lib/current-profile";
+import { currentProfile, profileCanUsePlay, profileNeedsOnboarding, profileShouldRequestAuthorization } from "@/lib/current-profile";
 import { redirect } from "next/navigation";
 
 export const metadata = { title: "Jugar | La Cantera Experience" };
@@ -9,7 +9,7 @@ export const metadata = { title: "Jugar | La Cantera Experience" };
 export default async function JugarPage() {
   const profile = await currentProfile();
   if (profile && profileNeedsOnboarding(profile)) redirect("/completar-perfil");
-  if (profile && !profileCanUsePlay(profile)) redirect("/solicitar-autorizacion");
+  if (profile && !profileCanUsePlay(profile) && profileShouldRequestAuthorization(profile)) redirect("/solicitar-autorizacion");
 
   return (
     <main className="min-h-screen bg-stone-50 pt-28 text-gray-950">
