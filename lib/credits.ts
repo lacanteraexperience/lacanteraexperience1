@@ -33,6 +33,8 @@ export async function ensureCreditSchema() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )
   `);
+  await sql.query("ALTER TABLE pack_purchases ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active'");
+  await sql.query("ALTER TABLE pack_purchases ADD COLUMN IF NOT EXISTS cancelled_at TIMESTAMPTZ");
 }
 
 export async function creditBalance(playerId: string): Promise<PlayerCredit> {
