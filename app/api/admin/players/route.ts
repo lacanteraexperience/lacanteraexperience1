@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export async function GET() {
   try {
     await requireAdministrator(); await ensurePlayerFields(); await ensureCommunicationSchema();
-    const players = await adminDatabase()`SELECT p.id::text, p.first_name, p.last_name, p.nickname, p.email, p.phone, p.club, p.auto_level, p.cantera_level, p.role, p.membership_status, p.community_declaration_at, p.created_at,
+    const players = await adminDatabase()`SELECT p.id::text, p.first_name, p.last_name, p.nickname, p.email, p.phone, p.auto_level, p.cantera_level, p.role, p.membership_status, p.community_declaration_at, p.created_at,
       (SELECT COUNT(*)::int FROM player_sanctions s WHERE s.player_id = p.id AND s.kind = 'alert' AND s.active = true) AS active_alerts,
       (SELECT s.ends_on FROM player_sanctions s WHERE s.player_id = p.id AND s.kind = 'suspension' AND s.active = true AND CURRENT_DATE BETWEEN s.starts_on AND s.ends_on ORDER BY s.ends_on DESC LIMIT 1) AS suspension_until
       FROM profiles p WHERE p.role IN ('player', 'organizer', 'admin') ORDER BY p.first_name, p.last_name`;
@@ -17,12 +17,12 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     await requireAdministrator(); await ensurePlayerFields();
-    const body = await request.json() as { firstName?: unknown; lastName?: unknown; nickname?: unknown; email?: unknown; phone?: unknown; club?: unknown; autoLevel?: unknown; canteraLevel?: unknown };
+    const body = await request.json() as { firstName?: unknown; lastName?: unknown; nickname?: unknown; email?: unknown; phone?: unknown; autoLevel?: unknown; canteraLevel?: unknown };
     const text = (value: unknown, limit: number) => typeof value === "string" ? value.trim().slice(0, limit) : "";
-    const firstName = text(body.firstName, 80), lastName = text(body.lastName, 120), nickname = text(body.nickname, 80), email = text(body.email, 254).toLowerCase(), phone = text(body.phone, 50), club = text(body.club, 120), autoLevel = text(body.autoLevel, 40), canteraLevel = text(body.canteraLevel, 40);
+    const firstName = text(body.firstName, 80), lastName = text(body.lastName, 120), nickname = text(body.nickname, 80), email = text(body.email, 254).toLowerCase(), phone = text(body.phone, 50), autoLevel = text(body.autoLevel, 40), canteraLevel = text(body.canteraLevel, 40);
     if (!firstName || !lastName) return Response.json({ error: "Nombre y apellido son obligatorios." }, { status: 400 });
     if (email && !/^\S+@\S+\.\S+$/.test(email)) return Response.json({ error: "El correo no es válido." }, { status: 400 });
-    const rows = await adminDatabase()`INSERT INTO profiles (first_name, last_name, nickname, email, phone, club, role, auto_level, cantera_level) VALUES (${firstName}, ${lastName}, ${nickname || null}, ${email || null}, ${phone || null}, ${club || null}, 'player', ${autoLevel || null}, ${canteraLevel || null}) RETURNING id::text, first_name, last_name, nickname, email, phone, club, auto_level, cantera_level, created_at`;
+    const rows = await adminDatabase()`INSERT INTO profiles (first_name, last_name, nickname, email, phone, role, auto_level, cantera_level) VALUES (${firstName}, ${lastName}, ${nickname || null}, ${email || null}, ${phone || null}, 'player', ${autoLevel || null}, ${canteraLevel || null}) RETURNING id::text, first_name, last_name, nickname, email, phone, auto_level, cantera_level, created_at`;
     return Response.json({ player: rows[0] }, { status: 201 });
   } catch (error) { const message = error instanceof Error ? error.message : "No se pudo crear el perfil."; return Response.json({ error: message.includes("unique") ? "Ya existe un perfil con ese correo." : message }, { status: 400 }); }
 }
