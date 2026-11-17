@@ -131,7 +131,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
             >
               Solicita tu experiencia
             </Link>
-            <Link href="/jugar" className="text-sm font-semibold text-white transition hover:text-lime-300">Jugar</Link>
+            <Link href="/jugar" className={isSignedIn ? "rounded-full bg-lime-500 px-4 py-2 text-sm font-black text-black shadow-lg shadow-lime-500/20 transition hover:bg-lime-400" : "text-sm font-semibold text-white transition hover:text-lime-300"}>Jugar</Link>
             {isSignedIn ? <><Link href="/mis-partidos" className="text-sm font-semibold text-white transition hover:text-lime-300">Mis partidos</Link><Link href="/mi-saldo" className="text-sm font-semibold text-white transition hover:text-lime-300">Mi saldo</Link>{isAdministrator && <Link href="/administracion" className="rounded-full bg-lime-500 px-4 py-2 text-sm font-bold text-black">Administración</Link>}{noticesLink}{profileLink}<SignOutButton><button type="button" className="text-xs font-semibold text-white/80 transition hover:text-lime-300">Salir</button></SignOutButton></> : <a href="/iniciar-sesion" className="text-sm font-semibold text-white transition hover:text-lime-300">Inicia sesión / Regístrate</a>}
           </div>
 
