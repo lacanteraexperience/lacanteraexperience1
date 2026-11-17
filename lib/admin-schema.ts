@@ -41,11 +41,18 @@ export async function ensureFinanceSchema() {
   const sql = adminDatabase();
   await sql.query(`CREATE TABLE IF NOT EXISTS financial_entries (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(), entry_date DATE NOT NULL,
-    kind TEXT NOT NULL CHECK (kind IN ('income', 'expense')), concept TEXT NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('income', 'expense', 'transfer')), concept TEXT NOT NULL,
     category TEXT NOT NULL, amount_cents INTEGER NOT NULL CHECK (amount_cents > 0), note TEXT,
     created_by UUID REFERENCES profiles(id) ON DELETE SET NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`);
   await sql.query("ALTER TABLE financial_entries ADD COLUMN IF NOT EXISTS payment_method TEXT");
+  await sql.query("ALTER TABLE financial_entries ADD COLUMN IF NOT EXISTS account TEXT");
+  await sql.query("ALTER TABLE financial_entries ADD COLUMN IF NOT EXISTS transfer_to_account TEXT");
+  await sql.query("ALTER TABLE financial_entries ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ");
+  await sql.query("ALTER TABLE financial_entries ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES profiles(id) ON DELETE SET NULL");
+  await sql.query("ALTER TABLE financial_entries DROP CONSTRAINT IF EXISTS financial_entries_kind_check");
+  await sql.query("ALTER TABLE financial_entries ADD CONSTRAINT financial_entries_kind_check CHECK (kind IN ('income', 'expense', 'transfer'))");
+  await sql.query("UPDATE financial_entries SET account = CASE WHEN payment_method = 'cash' THEN 'cash_lau' WHEN payment_method IN ('transfer', 'card') THEN 'bank' ELSE 'bank' END WHERE account IS NULL");
 }
 
 export async function ensureCommunicationSchema() {
