@@ -70,27 +70,27 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
       </div>
     </div>
 
-    <div className={`overflow-hidden border-t border-white/10 bg-zinc-950 text-white transition-[max-height,opacity] duration-300 ${menuOpen ? "max-h-[calc(100svh-6rem)] opacity-100" : "max-h-0 opacity-0"}`}>
-      <nav className="mx-auto grid max-w-7xl gap-7 overflow-y-auto px-6 py-7 lg:grid-cols-[1fr_1.1fr] lg:px-8">
-        <section className="rounded-3xl bg-lime-950/70 p-5 ring-1 ring-lime-400/40">
-          <p className="text-xs font-black uppercase tracking-[.18em] text-lime-300">La Cantera Play</p>
-          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-            <Link href="/jugar" onClick={closeMenu} className="rounded-2xl bg-white px-4 py-3 text-center font-black text-gray-950 transition hover:bg-lime-100">Jugar</Link>
-            {isSignedIn ? <>
-              <Link href="/mis-partidos" onClick={closeMenu} className="rounded-2xl px-4 py-3 text-center font-semibold transition hover:bg-white/10">Mis partidos</Link>
-              <Link href="/mi-saldo" onClick={closeMenu} className="rounded-2xl px-4 py-3 text-center font-semibold transition hover:bg-white/10">Mi saldo</Link>
-              <Link href="/conexiones-cantera" onClick={closeMenu} className="rounded-2xl bg-lime-400/10 px-4 py-3 text-center font-black text-lime-300 ring-1 ring-lime-300/40 transition hover:bg-lime-400 hover:text-black">Conexiones</Link>
-              {isAdministrator ? <Link href="/administracion" onClick={closeMenu} className="rounded-2xl bg-lime-500 px-4 py-3 text-center font-black text-black transition hover:bg-lime-400">Administración</Link> : null}
-              <Link href="/notificaciones" onClick={closeMenu} className="rounded-2xl px-4 py-3 text-center font-semibold transition hover:bg-white/10">Avisos{unreadNotices ? ` · ${unreadNotices}` : ""}</Link>
-              <Link href="/mi-perfil" onClick={closeMenu} className="rounded-2xl px-4 py-3 text-center font-semibold transition hover:bg-white/10">Mi perfil</Link>
-              <SignOutButton><button type="button" onClick={closeMenu} className="rounded-2xl px-4 py-3 text-center font-semibold text-white/75 transition hover:bg-white/10 hover:text-white">Cerrar sesión</button></SignOutButton>
-            </> : <Link href="/iniciar-sesion" onClick={closeMenu} className="rounded-2xl px-4 py-3 text-center font-semibold transition hover:bg-white/10">Inicia sesión / Regístrate</Link>}
-          </div>
-        </section>
-        <section className="rounded-3xl bg-white/[.06] p-5 ring-1 ring-white/15">
+    <div className={`absolute left-1/2 top-full w-[min(calc(100vw-2rem),52rem)] -translate-x-1/2 overflow-hidden rounded-b-3xl border border-t-0 border-white/15 bg-zinc-950 text-white shadow-2xl transition-[max-height,opacity] duration-300 ${menuOpen ? "max-h-[calc(100svh-7rem)] opacity-100" : "max-h-0 border-transparent opacity-0"}`}>
+      <nav className="grid max-h-[calc(100svh-7rem)] gap-4 overflow-y-auto p-4 sm:p-5 lg:grid-cols-[1.1fr_.9fr]">
+        <section className="rounded-2xl bg-white/[.06] p-4 ring-1 ring-white/15">
           <p className="text-xs font-black uppercase tracking-[.18em] text-lime-300">La Cantera Experience</p>
-          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{publicLinks.map((link) => <a key={link.href} href={link.href} onClick={closeMenu} className="rounded-2xl px-4 py-3 text-center font-semibold transition hover:bg-white/10 hover:text-lime-300">{link.label}</a>)}</div>
-          <Link href="/#contacto" onClick={closeMenu} className="mt-4 block rounded-2xl bg-lime-500 px-5 py-3 text-center font-black text-black transition hover:bg-lime-400">Solicita tu experiencia</Link>
+          <div className="mt-3 grid gap-1">{publicLinks.map((link) => <a key={link.href} href={link.href} onClick={closeMenu} className="rounded-xl px-4 py-2.5 font-semibold transition hover:bg-white/10 hover:text-lime-300">{link.label}</a>)}</div>
+          <Link href="/#contacto" onClick={closeMenu} className="mt-3 block rounded-xl bg-lime-500 px-5 py-3 text-center font-black text-black transition hover:bg-lime-400">Solicita tu experiencia</Link>
+        </section>
+        <section className="rounded-2xl bg-lime-950/70 p-4 ring-1 ring-lime-400/40">
+          <p className="text-xs font-black uppercase tracking-[.18em] text-lime-300">La Cantera Play</p>
+          <div className="mt-3 grid gap-1">
+            <Link href="/jugar" onClick={closeMenu} className="rounded-xl bg-white px-4 py-2.5 text-center font-black text-gray-950 transition hover:bg-lime-100">Jugar</Link>
+            {isSignedIn ? <>
+              <Link href="/mis-partidos" onClick={closeMenu} className="rounded-xl px-4 py-2.5 text-center font-semibold transition hover:bg-white/10">Mis partidos</Link>
+              <Link href="/mi-saldo" onClick={closeMenu} className="rounded-xl px-4 py-2.5 text-center font-semibold transition hover:bg-white/10">Mi saldo</Link>
+              <Link href="/conexiones-cantera" onClick={closeMenu} className="rounded-xl bg-lime-400/10 px-4 py-2.5 text-center font-black text-lime-300 ring-1 ring-lime-300/40 transition hover:bg-lime-400 hover:text-black">Conexiones</Link>
+              {isAdministrator ? <Link href="/administracion" onClick={closeMenu} className="rounded-xl bg-lime-500 px-4 py-2.5 text-center font-black text-black transition hover:bg-lime-400">Administración</Link> : null}
+              <Link href="/notificaciones" onClick={closeMenu} className="rounded-xl px-4 py-2.5 text-center font-semibold transition hover:bg-white/10">Avisos{unreadNotices ? ` · ${unreadNotices}` : ""}</Link>
+              <Link href="/mi-perfil" onClick={closeMenu} className="rounded-xl px-4 py-2.5 text-center font-semibold transition hover:bg-white/10">Mi perfil</Link>
+              <SignOutButton><button type="button" onClick={closeMenu} className="rounded-xl px-4 py-2.5 text-center font-semibold text-white/75 transition hover:bg-white/10 hover:text-white">Cerrar sesión</button></SignOutButton>
+            </> : <Link href="/iniciar-sesion" onClick={closeMenu} className="rounded-xl px-4 py-2.5 text-center font-semibold transition hover:bg-white/10">Inicia sesión / Regístrate</Link>}
+          </div>
         </section>
       </nav>
     </div>
