@@ -40,7 +40,7 @@ export default function ConnectionsCanteraPreview() {
           <div className="mb-5 flex items-end justify-between gap-4">
             <div>
               <p className="text-xs font-black uppercase tracking-[.2em] text-lime-700">Descubrir perfiles</p>
-              <h2 id="descubrir-title" className="mt-1 text-2xl font-black tracking-tight">Candidatas</h2>
+              <h2 id="descubrir-title" className="mt-1 text-2xl font-black tracking-tight">Jugadoras</h2>
             </div>
             <span className="rounded-full bg-white px-3 py-2 text-xs font-bold text-gray-600 ring-1 ring-stone-200">{selected + 1} / {sampleProfiles.length}</span>
           </div>
