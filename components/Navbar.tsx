@@ -55,7 +55,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
   }, [isSignedIn, pathname]);
 
   const headerDark = dark || scrolled || menuOpen;
-  const headerText = headerDark ? "text-white" : "text-gray-950";
+  const headerText = "text-white";
   const profileLink = <Link href="/mi-perfil" onClick={closeMenu} aria-label="Ir a mi perfil" title="Mi perfil" className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-lime-500 text-sm font-black text-black ring-2 ring-white/70 transition hover:scale-105">{user?.hasImage ? <img src={user.imageUrl} alt="Foto de perfil" className="h-full w-full object-cover" /> : profileInitials}</Link>;
   const noticesLink = <Link href="/notificaciones" onClick={closeMenu} aria-label="Ver avisos" title="Avisos" className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/10"><Bell className="h-5 w-5" />{unreadNotices ? <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-lime-400 px-1 text-[10px] font-black text-black">{unreadNotices > 9 ? "9+" : unreadNotices}</span> : null}</Link>;
 
@@ -66,7 +66,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
       </Link>
       <div className="flex items-center gap-3">
         {isSignedIn ? <>{noticesLink}{profileLink}</> : <Link href="/iniciar-sesion" className={`hidden text-sm font-bold transition hover:text-lime-300 sm:block ${headerText}`}>Inicia sesión</Link>}
-        <button type="button" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"} className={`grid h-11 w-11 place-items-center rounded-full border transition ${headerDark ? "border-white/25 text-white hover:border-lime-300 hover:text-lime-300" : "border-gray-900/25 text-gray-950 hover:border-lime-600 hover:text-lime-700"}`}>{menuOpen ? <HiXMark size={29} /> : <HiBars3 size={29} />}</button>
+        <button type="button" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"} className="grid h-11 w-11 place-items-center rounded-full border border-white/50 bg-black/25 text-white shadow-lg backdrop-blur-sm transition hover:border-lime-300 hover:text-lime-300">{menuOpen ? <HiXMark size={29} /> : <HiBars3 size={29} />}</button>
       </div>
     </div>
 
