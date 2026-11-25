@@ -80,16 +80,16 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
         <section className="rounded-2xl bg-lime-950/70 p-4 ring-1 ring-lime-400/40">
           <p className="text-xs font-black uppercase tracking-[.18em] text-lime-300">La Cantera Play</p>
           <div className="mt-3 grid gap-1">
-            <Link href="/jugar" onClick={closeMenu} className="rounded-xl bg-white px-4 py-2.5 text-center font-black text-gray-950 transition hover:bg-lime-100">Jugar</Link>
             {isSignedIn ? <>
+              <Link href="/conexiones-cantera" onClick={closeMenu} className="rounded-xl bg-lime-400/10 px-4 py-2.5 text-center font-black text-lime-300 ring-1 ring-lime-300/40 transition hover:bg-lime-400 hover:text-black">Conexiones</Link>
+              <Link href="/jugar" onClick={closeMenu} className="rounded-xl bg-white px-4 py-2.5 text-center font-black text-gray-950 transition hover:bg-lime-100">Jugar</Link>
               <Link href="/mis-partidos" onClick={closeMenu} className="rounded-xl px-4 py-2.5 text-center font-semibold transition hover:bg-white/10">Mis partidos</Link>
               <Link href="/mi-saldo" onClick={closeMenu} className="rounded-xl px-4 py-2.5 text-center font-semibold transition hover:bg-white/10">Mi saldo</Link>
-              <Link href="/conexiones-cantera" onClick={closeMenu} className="rounded-xl bg-lime-400/10 px-4 py-2.5 text-center font-black text-lime-300 ring-1 ring-lime-300/40 transition hover:bg-lime-400 hover:text-black">Conexiones</Link>
-              {isAdministrator ? <Link href="/administracion" onClick={closeMenu} className="rounded-xl bg-lime-500 px-4 py-2.5 text-center font-black text-black transition hover:bg-lime-400">Administración</Link> : null}
               <Link href="/notificaciones" onClick={closeMenu} className="rounded-xl px-4 py-2.5 text-center font-semibold transition hover:bg-white/10">Avisos{unreadNotices ? ` · ${unreadNotices}` : ""}</Link>
               <Link href="/mi-perfil" onClick={closeMenu} className="rounded-xl px-4 py-2.5 text-center font-semibold transition hover:bg-white/10">Mi perfil</Link>
+              {isAdministrator ? <Link href="/administracion" onClick={closeMenu} className="rounded-xl bg-lime-500 px-4 py-2.5 text-center font-black text-black transition hover:bg-lime-400">Administración</Link> : null}
               <SignOutButton><button type="button" onClick={closeMenu} className="rounded-xl px-4 py-2.5 text-center font-semibold text-white/75 transition hover:bg-white/10 hover:text-white">Cerrar sesión</button></SignOutButton>
-            </> : <Link href="/iniciar-sesion" onClick={closeMenu} className="rounded-xl px-4 py-2.5 text-center font-semibold transition hover:bg-white/10">Inicia sesión / Regístrate</Link>}
+            </> : <><Link href="/jugar" onClick={closeMenu} className="rounded-xl bg-white px-4 py-2.5 text-center font-black text-gray-950 transition hover:bg-lime-100">Jugar</Link><Link href="/iniciar-sesion" onClick={closeMenu} className="rounded-xl px-4 py-2.5 text-center font-semibold transition hover:bg-white/10">Inicia sesión / Regístrate</Link></>}
           </div>
         </section>
       </nav>
