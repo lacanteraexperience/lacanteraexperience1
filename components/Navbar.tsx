@@ -8,7 +8,7 @@ import { HiBars3, HiXMark } from "react-icons/hi2";
 import { SignOutButton, useUser } from "@clerk/nextjs";
 import { Bell } from "lucide-react";
 
-const links = [
+const publicLinks = [
   { href: "/#inicio", label: "Inicio" },
   { href: "/#nosotros", label: "Historia" },
   { href: "/#comunidad", label: "Comunidad" },
@@ -23,44 +23,30 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
   const [profileRole, setProfileRole] = useState<"player" | "organizer" | "admin" | null>(null);
   const [unreadNotices, setUnreadNotices] = useState(0);
   const { isSignedIn, user } = useUser();
-  const pathname = usePathname(); const router = useRouter();
+  const pathname = usePathname();
+  const router = useRouter();
   const isAdministrator = profileRole === "admin" || (user?.emailAddresses.some(({ emailAddress }) => {
     const [localPart, domain] = emailAddress.trim().toLowerCase().split("@");
     const normalized = (domain === "gmail.com" || domain === "googlemail.com") ? `${localPart?.split("+")[0].replaceAll(".", "")}@gmail.com` : emailAddress.trim().toLowerCase();
     return normalized === "lacanterafutfem@gmail.com";
   }) ?? false);
   const profileInitials = `${user?.firstName?.slice(0, 1) ?? ""}${user?.lastName?.slice(0, 1) ?? ""}`.trim().toUpperCase() || user?.primaryEmailAddress?.emailAddress?.slice(0, 1).toUpperCase() || "LC";
-  const profileLink = <Link href="/mi-perfil" aria-label="Ir a mi perfil" title="Mi perfil" className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-lime-500 text-sm font-black text-black ring-2 ring-white/70 transition hover:scale-105">{user?.hasImage ? <img src={user.imageUrl} alt="Foto de perfil" className="h-full w-full object-cover" /> : profileInitials}</Link>;
-  const noticesLink = <Link href="/notificaciones" aria-label="Ver avisos" title="Avisos" className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/10"><Bell className="h-5 w-5" />{unreadNotices ? <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-lime-400 px-1 text-[10px] font-black text-black">{unreadNotices > 9 ? "9+" : unreadNotices}</span> : null}</Link>;
+  const closeMenu = () => setMenuOpen(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 40);
-    };
-
-    handleScroll();
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 40);
+    handleScroll(); window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
-    if (!isSignedIn) {
-      setProfileRole(null);
-      return;
-    }
-    void fetch("/api/perfil")
-      .then((response) => response.ok ? response.json() : null)
-      .then((data: { profile?: { role?: "player" | "organizer" | "admin"; firstName?: string; lastName?: string; nickname?: string | null; phone?: string | null; autoLevel?: string | null } } | null) => {
-        setProfileRole(data?.profile?.role ?? null);
-        const profile = data?.profile;
-        const incomplete = !profile?.firstName || profile.firstName === "Jugadora" || !profile.lastName || !profile.nickname || !profile.phone || !profile.autoLevel;
-        if (incomplete && pathname !== "/completar-perfil") router.replace("/completar-perfil");
-      })
-      .catch(() => setProfileRole(null));
+    if (!isSignedIn) { setProfileRole(null); return; }
+    void fetch("/api/perfil").then((response) => response.ok ? response.json() : null).then((data: { profile?: { role?: "player" | "organizer" | "admin"; firstName?: string; lastName?: string; nickname?: string | null; phone?: string | null; autoLevel?: string | null } } | null) => {
+      setProfileRole(data?.profile?.role ?? null);
+      const profile = data?.profile;
+      const incomplete = !profile?.firstName || profile.firstName === "Jugadora" || !profile.lastName || !profile.nickname || !profile.phone || !profile.autoLevel;
+      if (incomplete && pathname !== "/completar-perfil") router.replace("/completar-perfil");
+    }).catch(() => setProfileRole(null));
   }, [isSignedIn, pathname, router]);
 
   useEffect(() => {
@@ -68,144 +54,45 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
     void fetch("/api/notifications", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).then((data: { unreadCount?: number } | null) => setUnreadNotices(data?.unreadCount ?? 0)).catch(() => setUnreadNotices(0));
   }, [isSignedIn, pathname]);
 
-  return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        dark
-          ? "bg-zinc-950 shadow-xl"
-          : scrolled
-          ? "bg-white/95 shadow-xl backdrop-blur-md"
-          : "bg-transparent"
-      }`}
-    >
-      <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-6 lg:px-8">
+  const headerDark = dark || scrolled || menuOpen;
+  const headerText = headerDark ? "text-white" : "text-gray-950";
+  const profileLink = <Link href="/mi-perfil" onClick={closeMenu} aria-label="Ir a mi perfil" title="Mi perfil" className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-lime-500 text-sm font-black text-black ring-2 ring-white/70 transition hover:scale-105">{user?.hasImage ? <img src={user.imageUrl} alt="Foto de perfil" className="h-full w-full object-cover" /> : profileInitials}</Link>;
+  const noticesLink = <Link href="/notificaciones" onClick={closeMenu} aria-label="Ver avisos" title="Avisos" className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/10"><Bell className="h-5 w-5" />{unreadNotices ? <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-lime-400 px-1 text-[10px] font-black text-black">{unreadNotices > 9 ? "9+" : unreadNotices}</span> : null}</Link>;
 
-        {/* =========================
-            LOGO
-        ========================= */}
+  return <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${headerDark ? "bg-zinc-950 shadow-xl" : "bg-transparent"}`}>
+    <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-6 lg:px-8">
+      <Link href="/#inicio" className="relative z-20 flex items-center transition-transform hover:scale-105" onClick={closeMenu}>
+        <Image src="/images/logo.png" alt="La Cantera Experience" width={160} height={160} priority className={headerDark ? "h-20 w-20 object-contain" : "relative top-8 h-[160px] w-[160px] object-contain"} />
+      </Link>
+      <div className="flex items-center gap-3">
+        {isSignedIn ? <>{noticesLink}{profileLink}</> : <Link href="/iniciar-sesion" className={`hidden text-sm font-bold transition hover:text-lime-300 sm:block ${headerText}`}>Inicia sesión</Link>}
+        <button type="button" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"} className={`grid h-11 w-11 place-items-center rounded-full border transition ${headerDark ? "border-white/25 text-white hover:border-lime-300 hover:text-lime-300" : "border-gray-900/25 text-gray-950 hover:border-lime-600 hover:text-lime-700"}`}>{menuOpen ? <HiXMark size={29} /> : <HiBars3 size={29} />}</button>
+      </div>
+    </div>
 
-        <Link
-          href="/#inicio"
-          className="relative z-20 flex items-center transition-transform duration-300 hover:scale-105"
-        >
-          <Image
-            src="/images/logo.png"
-            alt="La Cantera Experience"
-            width={160}
-            height={160}
-            priority
-            className={dark ? "h-20 w-20 object-contain" : "relative top-8 h-[160px] w-[160px] object-contain"}
-          />
-        </Link>
-
-        {/* =========================
-            MENÚ ESCRITORIO
-        ========================= */}
-
-        <nav className="hidden items-center gap-8 lg:flex">
-
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className={`group relative text-[15px] font-semibold transition-colors duration-300 ${
-                dark
-                  ? "text-white hover:text-lime-300"
-                  : scrolled
-                  ? "text-gray-800 hover:text-lime-600"
-                  : "text-white hover:text-lime-300"
-              }`}
-            >
-              {link.label}
-
-              <span className="absolute -bottom-2 left-0 h-[2px] w-0 rounded-full bg-lime-500 transition-all duration-300 group-hover:w-full" />
-            </a>
-          ))}
-
-          <div className="flex items-center gap-4">
-            <Link
-              href="/#contacto"
-              className={`text-xs font-semibold transition-colors duration-300 ${
-                dark ? "text-white/85 hover:text-lime-300" : scrolled ? "text-gray-600 hover:text-lime-600" : "text-white/85 hover:text-lime-300"
-              }`}
-            >
-              Solicita tu experiencia
-            </Link>
-            <Link href="/jugar" className={isSignedIn ? "rounded-full bg-lime-500 px-4 py-2 text-sm font-black text-black shadow-lg shadow-lime-500/20 transition hover:bg-lime-400" : "text-sm font-semibold text-white transition hover:text-lime-300"}>Jugar</Link>
-            {isSignedIn ? <><Link href="/mis-partidos" className="text-sm font-semibold text-white transition hover:text-lime-300">Mis partidos</Link><Link href="/conexiones-cantera" className="text-sm font-semibold text-lime-300 transition hover:text-lime-200">Conexiones</Link><Link href="/mi-saldo" className="text-sm font-semibold text-white transition hover:text-lime-300">Mi saldo</Link>{isAdministrator && <Link href="/administracion" className="rounded-full bg-lime-500 px-4 py-2 text-sm font-bold text-black">Administración</Link>}{noticesLink}{profileLink}<SignOutButton><button type="button" className="text-xs font-semibold text-white/80 transition hover:text-lime-300">Salir</button></SignOutButton></> : <a href="/iniciar-sesion" className="text-sm font-semibold text-white transition hover:text-lime-300">Inicia sesión / Regístrate</a>}
+    <div className={`overflow-hidden border-t border-white/10 bg-zinc-950 text-white transition-[max-height,opacity] duration-300 ${menuOpen ? "max-h-[calc(100svh-6rem)] opacity-100" : "max-h-0 opacity-0"}`}>
+      <nav className="mx-auto grid max-w-7xl gap-7 overflow-y-auto px-6 py-7 lg:grid-cols-[1fr_1.1fr] lg:px-8">
+        <section className="rounded-3xl bg-lime-950/70 p-5 ring-1 ring-lime-400/40">
+          <p className="text-xs font-black uppercase tracking-[.18em] text-lime-300">La Cantera Play</p>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+            <Link href="/jugar" onClick={closeMenu} className="rounded-2xl bg-white px-4 py-3 text-center font-black text-gray-950 transition hover:bg-lime-100">Jugar</Link>
+            {isSignedIn ? <>
+              <Link href="/mis-partidos" onClick={closeMenu} className="rounded-2xl px-4 py-3 text-center font-semibold transition hover:bg-white/10">Mis partidos</Link>
+              <Link href="/mi-saldo" onClick={closeMenu} className="rounded-2xl px-4 py-3 text-center font-semibold transition hover:bg-white/10">Mi saldo</Link>
+              <Link href="/conexiones-cantera" onClick={closeMenu} className="rounded-2xl bg-lime-400/10 px-4 py-3 text-center font-black text-lime-300 ring-1 ring-lime-300/40 transition hover:bg-lime-400 hover:text-black">Conexiones</Link>
+              {isAdministrator ? <Link href="/administracion" onClick={closeMenu} className="rounded-2xl bg-lime-500 px-4 py-3 text-center font-black text-black transition hover:bg-lime-400">Administración</Link> : null}
+              <Link href="/notificaciones" onClick={closeMenu} className="rounded-2xl px-4 py-3 text-center font-semibold transition hover:bg-white/10">Avisos{unreadNotices ? ` · ${unreadNotices}` : ""}</Link>
+              <Link href="/mi-perfil" onClick={closeMenu} className="rounded-2xl px-4 py-3 text-center font-semibold transition hover:bg-white/10">Mi perfil</Link>
+              <SignOutButton><button type="button" onClick={closeMenu} className="rounded-2xl px-4 py-3 text-center font-semibold text-white/75 transition hover:bg-white/10 hover:text-white">Cerrar sesión</button></SignOutButton>
+            </> : <Link href="/iniciar-sesion" onClick={closeMenu} className="rounded-2xl px-4 py-3 text-center font-semibold transition hover:bg-white/10">Inicia sesión / Regístrate</Link>}
           </div>
-
-        </nav>
-
-        {/* =========================
-            BOTÓN MÓVIL
-        ========================= */}
-
-        <div className="flex items-center gap-3 lg:hidden">
-          {isSignedIn ? <>{noticesLink}{profileLink}</> : null}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
-            className={`transition-colors duration-300 ${
-              dark || !scrolled ? "text-white" : "text-gray-900"
-            }`}
-          >
-            {menuOpen ? (
-              <HiXMark size={36} />
-            ) : (
-              <HiBars3 size={36} />
-            )}
-          </button>
-        </div>
-
-      </div>
-
-      {/* =========================
-          MENÚ MÓVIL
-      ========================= */}
-
-      <div
-        className={`transition-all duration-500 lg:hidden ${
-          menuOpen ? "max-h-[calc(100svh-6rem)] overflow-y-auto" : "max-h-0 overflow-hidden"
-        } ${
-          dark
-            ? "bg-zinc-950"
-            : scrolled
-            ? "bg-white/95 backdrop-blur-md"
-            : "bg-black/90 backdrop-blur-md"
-        }`}
-      >
-        <nav className="flex flex-col gap-2 px-6 py-6">
-
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setMenuOpen(false)}
-              className={`rounded-xl px-4 py-4 text-center font-medium transition-all duration-300 ${
-                dark
-                  ? "text-white hover:bg-white/10"
-                  : scrolled
-                  ? "text-gray-800 hover:bg-lime-100 hover:text-lime-700"
-                  : "text-white hover:bg-white/10"
-              }`}
-            >
-              {link.label}
-            </a>
-          ))}
-
-          <Link
-            href="/#contacto"
-            onClick={() => setMenuOpen(false)}
-            className="mt-4 rounded-full bg-lime-500 px-6 py-4 text-center font-semibold text-black transition-all duration-300 hover:bg-lime-400"
-          >
-            Solicita tu experiencia
-          </Link>
-          <section className="mt-3 rounded-2xl bg-lime-950/90 p-3 ring-1 ring-lime-400/50"><p className="px-2 pb-2 text-xs font-black uppercase tracking-[0.16em] text-lime-300">La Cantera Play</p><Link href="/jugar" onClick={() => setMenuOpen(false)} className="block rounded-xl bg-white px-4 py-3 text-center font-bold text-gray-950 transition hover:bg-lime-100">Jugar</Link>{isSignedIn ? <><Link href="/mis-partidos" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-xl px-4 py-3 text-center font-medium text-white transition hover:bg-white/10">Mis partidos</Link><Link href="/notificaciones" onClick={() => setMenuOpen(false)} className="block rounded-xl px-4 py-3 text-center font-medium text-white transition hover:bg-white/10">Avisos{unreadNotices ? ` · ${unreadNotices}` : ""}</Link><Link href="/conexiones-cantera" onClick={() => setMenuOpen(false)} className="block rounded-xl px-4 py-3 text-center font-medium text-lime-300 transition hover:bg-white/10">Conexiones Cantera</Link><Link href="/mi-saldo" onClick={() => setMenuOpen(false)} className="block rounded-xl px-4 py-3 text-center font-medium text-white transition hover:bg-white/10">Mi saldo</Link>{isAdministrator && <Link href="/administracion" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-xl bg-lime-500 px-4 py-3 text-center font-bold text-black">Administración</Link>}<SignOutButton><button type="button" onClick={() => setMenuOpen(false)} className="mt-2 block w-full rounded-xl px-4 py-3 text-center font-medium text-white transition hover:bg-white/10">Cerrar sesión</button></SignOutButton></> : <Link href="/iniciar-sesion" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-xl px-4 py-3 text-center font-medium text-white transition hover:bg-white/10">Inicia sesión / Regístrate</Link>}</section>
-
-
-        </nav>
-      </div>
-    </header>
-  );
+        </section>
+        <section className="rounded-3xl bg-white/[.06] p-5 ring-1 ring-white/15">
+          <p className="text-xs font-black uppercase tracking-[.18em] text-lime-300">La Cantera Experience</p>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{publicLinks.map((link) => <a key={link.href} href={link.href} onClick={closeMenu} className="rounded-2xl px-4 py-3 text-center font-semibold transition hover:bg-white/10 hover:text-lime-300">{link.label}</a>)}</div>
+          <Link href="/#contacto" onClick={closeMenu} className="mt-4 block rounded-2xl bg-lime-500 px-5 py-3 text-center font-black text-black transition hover:bg-lime-400">Solicita tu experiencia</Link>
+        </section>
+      </nav>
+    </div>
+  </header>;
 }
