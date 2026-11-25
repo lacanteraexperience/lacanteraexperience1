@@ -38,6 +38,7 @@ export async function ensurePlayerFields() {
   await sql.query("ALTER TABLE profiles ADD COLUMN IF NOT EXISTS community_declaration_at TIMESTAMPTZ");
   await sql.query("ALTER TABLE profiles ADD COLUMN IF NOT EXISTS membership_status TEXT NOT NULL DEFAULT 'pending'");
   await sql.query("ALTER TABLE profiles ADD COLUMN IF NOT EXISTS authorization_requested_at TIMESTAMPTZ");
+  await sql.query("ALTER TABLE profiles ADD COLUMN IF NOT EXISTS instagram_handle TEXT");
   await sql.query("UPDATE profiles SET membership_status = 'approved' WHERE role = 'admin' AND membership_status = 'pending'");
 }
 

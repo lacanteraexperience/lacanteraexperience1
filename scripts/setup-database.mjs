@@ -17,6 +17,7 @@ const schema = String.raw`
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   );
   ALTER TABLE profiles ADD COLUMN IF NOT EXISTS club TEXT;
+  ALTER TABLE profiles ADD COLUMN IF NOT EXISTS instagram_handle TEXT;
   CREATE TABLE IF NOT EXISTS activities (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT NOT NULL,
